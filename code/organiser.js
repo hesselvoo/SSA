@@ -5,9 +5,7 @@
 const {
   createChannel,
   createMessage,
-  parseMessage,
   mamAttach,
-  mamFetch,
   TrytesHelper,
 } = require("@iota/mam-chrysalis.js");
 const crypto = require("crypto");
@@ -20,7 +18,7 @@ const node = "https://api.lb-0.testnet.chrysalis2.com/";
 
 const privateOrgPrivateTitle = "Interreg Blockchain-event";
 const privateOrgPrivateEventKey = "1928374655367182725143759";
-
+// the privatekey which generates the publickey to encrypt attendancy-transaction
 const publicEventKey = "92837151423132255588337736251662";
 
 const organiserName = "Courseware Ltd.";
