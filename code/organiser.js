@@ -8,6 +8,7 @@ const {
 } = require("@iota/mam-chrysalis.js");
 const crypto = require("crypto");
 const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
+const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
 
@@ -163,6 +164,18 @@ const payload1 = {
   eventPublicKey: publicEventKey,
 };
 
+function saveChannelState() {
+  // Store the channel state.
+  try {
+    fs.writeFileSync(
+      "./channelState.json",
+      JSON.stringify(channelState, undefined, "\t")
+    );
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function makeMamEntryPointAttendee() {
   attendeeQRcode = generateSeed(81);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
@@ -172,6 +185,7 @@ function makeMamEntryPointAttendee() {
   addEvent2Mam(payload1);
 
   // sla nextroot op om deelnemerslijst te appenden
+  saveChannelState();
 }
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());
