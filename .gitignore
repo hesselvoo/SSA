@@ -123,3 +123,7 @@ dist/
 # Temporary folders
 tmp/
 temp/
+
+# Parameter-saving files
+QRcode.json
+channelState.json

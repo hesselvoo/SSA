@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////////////
+// Organiser init-event-app
+//////////////////////////////////////////////////////////
+
 const {
   createChannel,
   createMessage,
@@ -41,7 +45,7 @@ const commonSideKey =
 let attendeeQRcode = "";
 
 async function setupMam(payload) {
-  // add message to MAM
+  // add Organiser-Privatemessage to MAM
   const mode = "restricted";
   const sideKey = organiserKey;
 
@@ -65,8 +69,8 @@ async function setupMam(payload) {
   console.log("Root:", mamMessage.root);
   console.log("NextRoot:", channelState.nextRoot);
 
-  console.log("Attaching =================".red);
   // Attach the message.
+  console.log("Attaching =================".red);
   console.log("Attaching private-Eventmessage to tangle, please wait...");
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
   console.log(`Message Id`, messageId);
@@ -77,11 +81,10 @@ async function setupMam(payload) {
 }
 
 async function addEvent2Mam(payload) {
-  // add message to MAM
+  // add Event-message to MAM
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  //TODO change channel-sidekey to commonKey
   channelState.sideKey = commonSideKey;
   console.log("Payload =================".red);
   console.log(JSON.stringify(payload));
@@ -103,8 +106,8 @@ async function addEvent2Mam(payload) {
   console.log("Root:", mamMessage.root);
   console.log("NextRoot:", channelState.nextRoot);
 
-  console.log("Attaching =================".red);
   // Attach the message.
+  console.log("Attaching =================".red);
   console.log("Attaching Eventmessage to tangle, please wait...");
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
   console.log(`Message Id`, messageId);
@@ -165,6 +168,7 @@ const payload1 = {
 
 function saveChannelState() {
   // Store the channel state so we can use it in evenclose.js
+  console.log("Save channelstate >>>>>>>>".green);
   try {
     fs.writeFileSync(
       "./channelState.json",
@@ -177,6 +181,7 @@ function saveChannelState() {
 
 function saveQR(qrcode) {
   // save QRcode so we can use it in attendee.js
+  console.log("Save QRcode >>>>>>>>".green);
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
   } catch (e) {
@@ -189,9 +194,8 @@ function makeMamEntryPointAttendee() {
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
   saveQR(attendeeQRcode);
 
-  // doe een datatransactie met nextroot als arg. op adres1 van seed : channelState.nextRoot
-
   addEvent2Mam(payload1);
+  //TODO doe een datatransactie met root als arg. op adres1 van seed
 
   // sla nextroot op om deelnemerslijst te appenden
   saveChannelState();
