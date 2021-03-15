@@ -164,7 +164,7 @@ const payload1 = {
 };
 
 function saveChannelState() {
-  // Store the channel state.
+  // Store the channel state so we can use it in evenclose.js
   try {
     fs.writeFileSync(
       "./channelState.json",
@@ -176,7 +176,7 @@ function saveChannelState() {
 }
 
 function saveQR(qrcode) {
-  // Store the channel state.
+  // save QRcode so we can use it in attendee.js
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
   } catch (e) {
