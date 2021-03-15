@@ -176,16 +176,14 @@ function saveChannelState() {
 }
 
 function saveQR(qrcode) {
-    // Store the channel state.
-    try {
-      fs.writeFileSync(
-        "./QRcode.json", qrcode, undefined, "\t")
-      );
-    } catch (e) {
-      console.error(e);
-    }
+  // Store the channel state.
+  try {
+    fs.writeFileSync("./QRcode.json", qrcode);
+  } catch (e) {
+    console.error(e);
   }
-  
+}
+
 function makeMamEntryPointAttendee() {
   attendeeQRcode = generateSeed(81);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
