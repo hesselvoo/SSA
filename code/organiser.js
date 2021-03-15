@@ -44,7 +44,6 @@ async function setupMam(payload) {
   // add message to MAM
   const mode = "restricted";
   const sideKey = organiserKey;
-  //   const sideKey = commonSideKey;
 
   channelState = createChannel(eventSEED, 2, mode, sideKey);
   const mamMessage = createMessage(
@@ -128,9 +127,9 @@ function generateSeed(length) {
 
 console.log("SSA-organiser-app".cyan);
 // Unique SEED per event
-eventSEED = prompt("Event SEED (*=default): ");
+eventSEED = prompt("Event SEED -81 UPPERCASE A-Z,9- (*=default): ");
 // password for the private organiser MAMrecord (first in the MAM)
-organiserKey = prompt("OrganiserKey -Uppercase, no numbers- (*=default): ");
+organiserKey = prompt("OrganiserKey -UPPERCASE A-Z,9- (*=default): ");
 
 if (eventSEED === "*") {
   // generate default for debugging -for lazy people-
@@ -176,11 +175,23 @@ function saveChannelState() {
   }
 }
 
+function saveQR(qrcode) {
+    // Store the channel state.
+    try {
+      fs.writeFileSync(
+        "./QRcode.json", qrcode, undefined, "\t")
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  
 function makeMamEntryPointAttendee() {
   attendeeQRcode = generateSeed(81);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
+  saveQR(attendeeQRcode);
 
-  // doe een datatransactie met nextroot als arg. op adres1 van seed
+  // doe een datatransactie met nextroot als arg. op adres1 van seed : channelState.nextRoot
 
   addEvent2Mam(payload1);
 
