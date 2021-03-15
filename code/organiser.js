@@ -34,7 +34,8 @@ const eventLocation = "Online";
 let eventSEED = "";
 let organiserKey = "";
 let channelState;
-const commonSideKey = "SSACOMMONKEY";
+const commonSideKey =
+  "SSACOMMONKEY999999999999999999999999999999999999999999999999999999999999999999999";
 
 let attendeeQRcode = "";
 
@@ -63,8 +64,8 @@ async function setupMam(payload) {
   console.log("Address:", mamMessage.address);
   console.log("Root:", mamMessage.root);
   console.log("NextRoot:", channelState.nextRoot);
-  console.log("=================".red);
 
+  console.log("Attaching =================".red);
   // Attach the message.
   console.log("Attaching private-Eventmessage to tangle, please wait...");
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
@@ -101,8 +102,8 @@ async function addEvent2Mam(payload) {
   console.log("Address:", mamMessage.address);
   console.log("Root:", mamMessage.root);
   console.log("NextRoot:", channelState.nextRoot);
-  console.log("=================".red);
 
+  console.log("Attaching =================".red);
   // Attach the message.
   console.log("Attaching Eventmessage to tangle, please wait...");
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
@@ -128,16 +129,15 @@ console.log("SSA-organiser-app".cyan);
 // Unique SEED per event
 eventSEED = prompt("Event SEED (*=default): ");
 // password for the private organiser MAMrecord (first in the MAM)
-organiserKey = prompt("OrganiserKey (*=default): ");
+organiserKey = prompt("OrganiserKey -Uppercase, no numbers- (*=default): ");
 
 if (eventSEED === "*") {
   // generate default for debugging -for lazy people-
   eventSEED = generateSeed(81);
-  // "TE9TETJIPWIMSZVTJFZTU9LGNRPRRFVWJXSRVFDABQGEBLADQ9FZHPAHQSJHHQQS9Y9XMCUTFQCBOKSGL";
 }
 if (organiserKey === "*") {
   // for first record of MAM (which is private)
-  organiserKey = "SECRETORGANISERKEY";
+  organiserKey = commonSideKey;
 }
 console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
@@ -160,7 +160,7 @@ const payload1 = {
   eventloc: eventLocation,
   eventdate: eventDate,
   eventtime: eventTime,
-  eventPkey: publicEventKey,
+  eventPublicKey: publicEventKey,
 };
 
 function makeMamEntryPointAttendee() {
@@ -170,6 +170,8 @@ function makeMamEntryPointAttendee() {
   // doe een datatransactie met nextroot als arg. op adres1 van seed
 
   addEvent2Mam(payload1);
+
+  // sla nextroot op om deelnemerslijst te appenden
 }
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());
