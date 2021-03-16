@@ -28,6 +28,7 @@ const organiserCity = "London";
 const organiserURL = "http://courseware.com";
 const organiserTelephone = "01 234 56 789";
 const organiserMail = "info@courseware.com";
+const organiserDID = "did:example:123456789abcdefghi#key-1";
 
 const eventName = "Interreg Bling Midterm-conference";
 const eventDate = "March 9th 2021";
@@ -157,6 +158,7 @@ const payload1 = {
   orgtel: organiserTelephone,
   orgmail: organiserMail,
   orgurl: organiserURL,
+  orgdid: organiserDID,
   eventname: eventName,
   eventloc: eventLocation,
   eventdate: eventDate,
