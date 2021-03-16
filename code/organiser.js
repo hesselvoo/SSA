@@ -116,6 +116,7 @@ async function addEvent2Mam(payload) {
   console.log("===============================".yellow);
 }
 function generateSeed(length) {
+  // Random string A-Z,9 -for seeds
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
   let seed = "";
   while (seed.length < length) {
@@ -145,12 +146,14 @@ console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
 
 const payload0 = {
+  // Information for the private-organiser-Mam-record
   title: privateOrgPrivateTitle,
   timestamp: new Date().toLocaleString(),
   eventPrivateKey: privateOrgPrivateEventKey,
 };
 
 const payload1 = {
+  // Information for the 1st public-Mam-record
   orgname: organiserName,
   orgaddress: organiserAddress,
   orgzip: organiserPostcode,
@@ -192,8 +195,7 @@ function saveQR(qrcode) {
   }
 }
 
-function makeQRMAM(
-  attendeeQRcode,
+async function makeQRmam(
   publicEventRoot,
   attendanceNotificationKey,
   expiryDateTime
@@ -204,7 +206,7 @@ function makeQRMAM(
   // timestamp - expiryDateTime
 
   const mode = "restricted";
-  const sideKey = "date"; //TODO change for dynamic UTC-date
+  const sideKey = "DATE"; //TODO change for dynamic UTC-date
   let channelQRState;
 
   const payloadQR = {
@@ -212,6 +214,10 @@ function makeQRMAM(
     indexation: attendanceNotificationKey,
     expirytimestamp: expiryDateTime,
   };
+
+  console.log("PayloadQR =================".red);
+  console.log(payloadQR);
+  console.log("=================".red);
 
   attendeeQRcode = "SSA" + generateSeed(78);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
@@ -248,15 +254,17 @@ function makeQRMAM(
 }
 
 function makeMamEntryPointAttendee() {
-  const attendanceNotificationKey = generateSeed(64);
+  let attendanceNotificationKey = "";
   const publicEventRoot = channelState.nextRoot;
   const expiryDateTime = new Date();
+
+  attendanceNotificationKey = generateSeed(64);
+  console.log(`nextroot : ${channelState.nextRoot}`.red);
+  makeQRmam(channelState.nextRoot, attendanceNotificationKey, expiryDateTime);
 
   addEvent2Mam(payload1);
   // sla nextroot op om deelnemerslijst te appenden
   saveChannelState();
-
-  makeQRmam(publicEventRoot, attendanceNotificationKey, expiryDateTime);
 }
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());
