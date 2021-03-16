@@ -202,19 +202,61 @@ function makeQRMAM(
   // publicRootEventMAM -as link to Eventinformation
   // indexation - as tag for attendance-transactions/notifications
   // timestamp - expiryDateTime
+
+  const mode = "restricted";
+  const sideKey = "date"; //TODO change for dynamic UTC-date
+  let channelQRState;
+
+  const payloadQR = {
+    root: publicEventRoot,
+    indexation: attendanceNotificationKey,
+    expirytimestamp: expiryDateTime,
+  };
+
+  attendeeQRcode = "SSA" + generateSeed(78);
+  console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
+
+  channelQRState = createChannel(attendeeQRcode, 2, mode, sideKey);
+
+  const mamMessage = createMessage(
+    channelQRState,
+    TrytesHelper.fromAscii(JSON.stringify(payloadQR))
+  );
+
+  console.log(`Attendee QR-root : ${mamMessage.root}`.yellow);
+  saveQR(mamMessage.root); // plus sidekey?!
+
+  console.log("channelQRState =================".red);
+  console.log(channelQRState);
+
+  // Display the details for the MAM message.
+  console.log("=================".red);
+  console.log("Seed:", channelQRState.seed);
+  console.log("Address:", mamMessage.address);
+  console.log("Root:", mamMessage.root);
+  console.log("NextRoot:", channelQRState.nextRoot);
+
+  // Attach the message.
+  console.log("Attaching =================".red);
+  console.log("Attaching Eventmessage to tangle, please wait...");
+  const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENTQR");
+  console.log(`Message Id`, messageId);
+  console.log(
+    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+  );
+  console.log("===============================".yellow);
 }
 
 function makeMamEntryPointAttendee() {
-  attendeeQRcode = "SSA" + generateSeed(78);
-  console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
-  saveQR(attendeeQRcode);
-
-  //TODO makeQRmam (attendeeQRcode,publicEventRoot,attendanceNotificationKey,expiryDateTime)
+  const attendanceNotificationKey = generateSeed(64);
+  const publicEventRoot = channelState.nextRoot;
+  const expiryDateTime = new Date();
 
   addEvent2Mam(payload1);
-
   // sla nextroot op om deelnemerslijst te appenden
   saveChannelState();
+
+  makeQRmam(publicEventRoot, attendanceNotificationKey, expiryDateTime);
 }
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());
