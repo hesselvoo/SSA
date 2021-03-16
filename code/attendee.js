@@ -13,6 +13,7 @@ const commonSideKey =
   "SSACOMMONKEY999999999999999999999999999999999999999999999999999999999999999999999";
 let publicEventRoot = "";
 let attendancyAddress = "";
+let eventInformation = "";
 
 function readQR() {
   // Try and load the QR-root from file
@@ -72,6 +73,7 @@ async function readPublicEventInfo(publicEventRoot) {
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
     console.log("Fetched : ", fMessage);
+    eventInformation = fMessage;
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
@@ -80,6 +82,23 @@ async function readPublicEventInfo(publicEventRoot) {
 }
 
 // presentEventInfo
+function presentEventInfo(eventRecord) {
+  console.log("=================================".red);
+  console.log("Event :".cyan);
+  console.log(`Name : ${eventRecord.eventname}`);
+  console.log(`Date : ${eventRecord.eventdate}`);
+  console.log(`Time : ${eventRecord.eventtime}`);
+  console.log(`Location : ${eventRecord.eventloc}`);
+  console.log("Organised by :".cyan);
+  console.log(`Organisation : ${eventRecord.orgname}`);
+  console.log(`Address : ${eventRecord.orgaddress}`);
+  console.log(`Zipcode : ${eventRecord.orgzip}`);
+  console.log(`City : ${eventRecord.orgcity}`);
+  console.log(`Tel.nr. : ${eventRecord.orgtel}`);
+  console.log(`E-mail : ${eventRecord.orgmail}`);
+  console.log(`WWW : ${eventRecord.orgurl}`);
+  console.log(`DID : ${eventRecord.orgdid}`);
+}
 
 // hashPersonalInfo
 
@@ -96,5 +115,5 @@ if (eventQR === "*") eventQR = readQRcode;
 readQRmam(eventQR).then(function () {
   if (publicEventRoot === "NON") {
     console.log("Invalid eventRoot-address".red);
-  } else readPublicEventInfo(publicEventRoot);
+  } else readPublicEventInfo(publicEventRoot).then(() => presentEventInfo(eventInformation));
 });
