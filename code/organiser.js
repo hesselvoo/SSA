@@ -181,6 +181,9 @@ function saveChannelState() {
 
 function saveQR(qrcode) {
   // save QRcode so we can use it in attendee.js
+
+  //TODO add expirationtime in QR-code so attendee-app signals expired
+
   console.log("Save QRcode >>>>>>>>".green);
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
@@ -189,13 +192,26 @@ function saveQR(qrcode) {
   }
 }
 
+function makeQRMAM(
+  attendeeQRcode,
+  publicEventRoot,
+  attendanceNotificationKey,
+  expiryDateTime
+) {
+  //This is a MAM with only 1 restricted-record:
+  // publicRootEventMAM -as link to Eventinformation
+  // indexation - as tag for attendance-transactions/notifications
+  // timestamp - expiryDateTime
+}
+
 function makeMamEntryPointAttendee() {
-  attendeeQRcode = generateSeed(81);
+  attendeeQRcode = "SSA" + generateSeed(78);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
   saveQR(attendeeQRcode);
 
+  //TODO makeQRmam (attendeeQRcode,publicEventRoot,attendanceNotificationKey,expiryDateTime)
+
   addEvent2Mam(payload1);
-  //TODO doe een datatransactie met root als arg. op adres1 van seed
 
   // sla nextroot op om deelnemerslijst te appenden
   saveChannelState();
