@@ -2,7 +2,12 @@
 // Attendee attend-event-app
 //////////////////////////////////////////////////////////
 
-const { mamFetch, TrytesHelper } = require("@iota/mam-chrysalis.js");
+const {
+  mamFetch,
+  TrytesHelper,
+  channelRoot,
+  createChannel,
+} = require("@iota/mam-chrysalis.js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -24,12 +29,13 @@ function readQR() {
 }
 
 // readQRmam
-async function readQRmam(qrRoot) {
+async function readQRmam(qrSeed) {
   const mode = "restricted";
   const sideKey = "DATE";
   let rootValue = "NON";
   let indexationKey = "";
 
+  let qrRoot = channelRoot(createChannel(qrSeed, 2, mode, sideKey));
   console.log("Fetching from tangle, please wait...");
   console.log(`Node : ${node}`.yellow);
   console.log(`qrRoot : ${qrRoot}`.yellow);
@@ -61,7 +67,7 @@ async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  console.log("Fetching from tangle, please wait...");
+  console.log("Fetching from tangle with this information :");
   console.log(`Node : ${node}`.yellow);
   console.log(`EventRoot : ${publicEventRoot}`.yellow);
   console.log(`mode : ${mode}`.yellow);
