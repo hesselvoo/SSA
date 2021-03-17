@@ -229,7 +229,7 @@ async function makeQRmam(
     TrytesHelper.fromAscii(JSON.stringify(payloadQR))
   );
 
-  saveQR(attendeeQRcode); // plus sidekey?!
+  saveQR(attendeeQRcode); // SEED    : plus sidekey?!
 
   console.log("channelQRState =================".red);
   console.log(channelQRState);
