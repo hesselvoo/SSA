@@ -49,8 +49,8 @@ async function readQRmam(qrRoot) {
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
-  console.log("MAMdata ===================".red);
-  console.log(`fetched : ${fetched.message}`.green);
+  // console.log("MAMdata ===================".red);
+  // console.log(`fetched : ${fetched.message}`.green);
   console.log("============================".yellow);
   publicEventRoot = rootValue;
   attendancyAddress = indexationKey;
@@ -77,8 +77,8 @@ async function readPublicEventInfo(publicEventRoot) {
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
-  console.log("MAMdata ===================".red);
-  console.log(`fetched : ${fetched.message}`.green);
+  // console.log("MAMdata ===================".red);
+  // console.log(`fetched : ${fetched.message}`.green);
 }
 
 // presentEventInfo
