@@ -229,8 +229,7 @@ async function makeQRmam(
     TrytesHelper.fromAscii(JSON.stringify(payloadQR))
   );
 
-  console.log(`Attendee QR-root : ${mamMessage.root}`.yellow);
-  saveQR(mamMessage.root); // plus sidekey?!
+  saveQR(attendeeQRcode); // SEED    : plus sidekey?!
 
   console.log("channelQRState =================".red);
   console.log(channelQRState);

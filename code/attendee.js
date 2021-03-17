@@ -2,7 +2,12 @@
 // Attendee attend-event-app
 //////////////////////////////////////////////////////////
 
-const { mamFetch, TrytesHelper } = require("@iota/mam-chrysalis.js");
+const {
+  mamFetch,
+  TrytesHelper,
+  channelRoot,
+  createChannel,
+} = require("@iota/mam-chrysalis.js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -24,12 +29,13 @@ function readQR() {
 }
 
 // readQRmam
-async function readQRmam(qrRoot) {
+async function readQRmam(qrSeed) {
   const mode = "restricted";
   const sideKey = "DATE";
   let rootValue = "NON";
   let indexationKey = "";
 
+  let qrRoot = channelRoot(createChannel(qrSeed, 2, mode, sideKey));
   console.log("Fetching from tangle, please wait...");
   console.log(`Node : ${node}`.yellow);
   console.log(`qrRoot : ${qrRoot}`.yellow);
@@ -49,8 +55,8 @@ async function readQRmam(qrRoot) {
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
-  console.log("MAMdata ===================".red);
-  console.log(`fetched : ${fetched.message}`.green);
+  // console.log("MAMdata ===================".red);
+  // console.log(`fetched : ${fetched.message}`.green);
   console.log("============================".yellow);
   publicEventRoot = rootValue;
   attendancyAddress = indexationKey;
@@ -61,7 +67,7 @@ async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  console.log("Fetching from tangle, please wait...");
+  console.log("Fetching from tangle with this information :");
   console.log(`Node : ${node}`.yellow);
   console.log(`EventRoot : ${publicEventRoot}`.yellow);
   console.log(`mode : ${mode}`.yellow);
@@ -77,8 +83,8 @@ async function readPublicEventInfo(publicEventRoot) {
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
-  console.log("MAMdata ===================".red);
-  console.log(`fetched : ${fetched.message}`.green);
+  // console.log("MAMdata ===================".red);
+  // console.log(`fetched : ${fetched.message}`.green);
 }
 
 // presentEventInfo
@@ -106,14 +112,20 @@ function presentEventInfo(eventRecord) {
 
 // compileVerifierQR
 
+async function mamInteract(eventQR) {
+  await readQRmam(eventQR);
+  if (publicEventRoot === "NON") {
+    console.log("Invalid eventRoot-address".red);
+  } else {
+    await readPublicEventInfo(publicEventRoot);
+    presentEventInfo(eventInformation);
+  }
+}
+
 console.log("SSA-attendee-app".cyan);
 let readQRcode = readQR();
 console.log(`QRcode from file = ${readQRcode}`.yellow);
 let eventQR = prompt("Event QR-code (*=savedversion): ");
 if (eventQR === "*") eventQR = readQRcode;
 
-readQRmam(eventQR).then(function () {
-  if (publicEventRoot === "NON") {
-    console.log("Invalid eventRoot-address".red);
-  } else readPublicEventInfo(publicEventRoot).then(() => presentEventInfo(eventInformation));
-});
+mamInteract(eventQR);
