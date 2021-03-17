@@ -106,14 +106,20 @@ function presentEventInfo(eventRecord) {
 
 // compileVerifierQR
 
+async function mamInteract(eventQR) {
+  await readQRmam(eventQR);
+  if (publicEventRoot === "NON") {
+    console.log("Invalid eventRoot-address".red);
+  } else {
+    await readPublicEventInfo(publicEventRoot);
+    presentEventInfo(eventInformation);
+  }
+}
+
 console.log("SSA-attendee-app".cyan);
 let readQRcode = readQR();
 console.log(`QRcode from file = ${readQRcode}`.yellow);
 let eventQR = prompt("Event QR-code (*=savedversion): ");
 if (eventQR === "*") eventQR = readQRcode;
 
-readQRmam(eventQR).then(function () {
-  if (publicEventRoot === "NON") {
-    console.log("Invalid eventRoot-address".red);
-  } else readPublicEventInfo(publicEventRoot).then(() => presentEventInfo(eventInformation));
-});
+mamInteract(eventQR);
