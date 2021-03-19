@@ -43,6 +43,69 @@ const commonSideKey =
 
 let attendeeQRcode = "";
 
+const payload0 = {
+  // Information for the private-organiser-Mam-record
+  title: privateOrgPrivateTitle,
+  timestamp: new Date().toLocaleString(),
+  eventPrivateKey: privateOrgPrivateEventKey,
+};
+
+const payload1 = {
+  // Information for the 1st public-Mam-record
+  orgname: organiserName,
+  orgaddress: organiserAddress,
+  orgzip: organiserPostcode,
+  orgcity: organiserCity,
+  orgtel: organiserTelephone,
+  orgmail: organiserMail,
+  orgurl: organiserURL,
+  orgdid: organiserDID,
+  eventname: eventName,
+  eventloc: eventLocation,
+  eventdate: eventDate,
+  eventtime: eventTime,
+  eventPublicKey: publicEventKey,
+};
+
+function generateSeed(length) {
+  // Random string A-Z,9 -for seeds
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
+  let seed = "";
+  while (seed.length < length) {
+    const byte = crypto.randomBytes(1);
+    if (byte[0] < 243) {
+      seed += charset.charAt(byte[0] % 27);
+    }
+  }
+  return seed;
+}
+
+function saveChannelState() {
+  // Store the channel state so we can use it in evenclose.js
+  console.log("Save channelstate >>>>>>>>".green);
+  try {
+    fs.writeFileSync(
+      "./channelState.json",
+      JSON.stringify(channelState, undefined, "\t")
+    );
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function saveQR(qrcode) {
+  // save QRcode so we can use it in attendee.js
+
+  //TODO add expirationtime in QR-code so attendee-app signals expired
+
+  console.log("Save QRcode >>>>>>>>".green);
+  try {
+    fs.writeFileSync("./QRcode.json", qrcode);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function setupMam(payload) {
   // add Organiser-Privatemessage to MAM
   const mode = "restricted";
@@ -54,10 +117,10 @@ async function setupMam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
-  //   console.log("mamMessage =================".red);
-  //   console.log(mamMessage);
-  console.log("channelState =================".red);
-  console.log(channelState);
+  // console.log("mamMessage =================".red);
+  // console.log(mamMessage);
+  // console.log("channelState =================".red);
+  // console.log(channelState);
   console.log("Payload =================".red);
   console.log(JSON.stringify(payload));
   console.log("=================".red);
@@ -93,10 +156,10 @@ async function addEvent2Mam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
-  console.log("channelState =================".red);
-  console.log(channelState);
-  //   console.log("mamMessage =================".red);
-  //   console.log(mamMessage);
+  // console.log("channelState =================".red);
+  // console.log(channelState);
+  // console.log("mamMessage =================".red);
+  // console.log(mamMessage);
 
   // Display the details for the MAM message.
   console.log("=================".red);
@@ -114,85 +177,6 @@ async function addEvent2Mam(payload) {
     `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
-}
-function generateSeed(length) {
-  // Random string A-Z,9 -for seeds
-  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
-  let seed = "";
-  while (seed.length < length) {
-    const byte = crypto.randomBytes(1);
-    if (byte[0] < 243) {
-      seed += charset.charAt(byte[0] % 27);
-    }
-  }
-  return seed;
-}
-
-console.log("SSA-organiser-app".cyan);
-// Unique SEED per event
-eventSEED = prompt("Event SEED -81 UPPERCASE A-Z,9- (*=default): ");
-// password for the private organiser MAMrecord (first in the MAM)
-organiserKey = prompt("OrganiserKey -UPPERCASE A-Z,9- (*=default): ");
-
-if (eventSEED === "*") {
-  // generate default for debugging -for lazy people-
-  eventSEED = generateSeed(81);
-}
-if (organiserKey === "*") {
-  // for first record of MAM (which is private)
-  organiserKey = commonSideKey;
-}
-console.log(`EventSEED = ${eventSEED}`.green);
-console.log(`OrganiserKey = ${organiserKey}`.green);
-
-const payload0 = {
-  // Information for the private-organiser-Mam-record
-  title: privateOrgPrivateTitle,
-  timestamp: new Date().toLocaleString(),
-  eventPrivateKey: privateOrgPrivateEventKey,
-};
-
-const payload1 = {
-  // Information for the 1st public-Mam-record
-  orgname: organiserName,
-  orgaddress: organiserAddress,
-  orgzip: organiserPostcode,
-  orgcity: organiserCity,
-  orgtel: organiserTelephone,
-  orgmail: organiserMail,
-  orgurl: organiserURL,
-  orgdid: organiserDID,
-  eventname: eventName,
-  eventloc: eventLocation,
-  eventdate: eventDate,
-  eventtime: eventTime,
-  eventPublicKey: publicEventKey,
-};
-
-function saveChannelState() {
-  // Store the channel state so we can use it in evenclose.js
-  console.log("Save channelstate >>>>>>>>".green);
-  try {
-    fs.writeFileSync(
-      "./channelState.json",
-      JSON.stringify(channelState, undefined, "\t")
-    );
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function saveQR(qrcode) {
-  // save QRcode so we can use it in attendee.js
-
-  //TODO add expirationtime in QR-code so attendee-app signals expired
-
-  console.log("Save QRcode >>>>>>>>".green);
-  try {
-    fs.writeFileSync("./QRcode.json", qrcode);
-  } catch (e) {
-    console.error(e);
-  }
 }
 
 async function makeQRmam(
@@ -231,8 +215,8 @@ async function makeQRmam(
 
   saveQR(attendeeQRcode); // SEED    : plus sidekey?!
 
-  console.log("channelQRState =================".red);
-  console.log(channelQRState);
+  // console.log("channelQRState =================".red);
+  // console.log(channelQRState);
 
   // Display the details for the MAM message.
   console.log("=================".red);
@@ -265,5 +249,22 @@ function makeMamEntryPointAttendee() {
   // sla nextroot op om deelnemerslijst te appenden
   saveChannelState();
 }
+
+console.log("SSA-organiser-app".cyan);
+// Unique SEED per event
+eventSEED = prompt("Event SEED -81 UPPERCASE A-Z,9- (*=default): ");
+// password for the private organiser MAMrecord (first in the MAM)
+organiserKey = prompt("OrganiserKey -UPPERCASE A-Z,9- (*=default): ");
+
+if (eventSEED === "*") {
+  // generate default for debugging -for lazy people-
+  eventSEED = generateSeed(81);
+}
+if (organiserKey === "*") {
+  // for first record of MAM (which is private)
+  organiserKey = commonSideKey;
+}
+console.log(`EventSEED = ${eventSEED}`.green);
+console.log(`OrganiserKey = ${organiserKey}`.green);
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());

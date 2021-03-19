@@ -78,7 +78,7 @@ async function readPublicEventInfo(publicEventRoot) {
   const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    console.log("Fetched : ", fMessage);
+    // console.log("Fetched : ", fMessage);
     eventInformation = fMessage;
   } else {
     console.log("Nothing was fetched from the MAM channel");
