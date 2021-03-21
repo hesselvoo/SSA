@@ -21,7 +21,7 @@ let attendancyAddress = "";
 let eventInformation = "";
 
 function readQR() {
-  // Try and load the QR-root from file
+  // Try and load the QR-root from file - as substitute for QRscan from camera
   try {
     const data = fs.readFileSync("./QRcode.json", "utf8");
     return data;
