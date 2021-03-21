@@ -1,7 +1,7 @@
 # Node-SSA-app
 
 This is the Self Sovereign Attendancy application.
-Written for NodeJS as a PoC.
+Written for NodeJS as a PoC (with lots of remarks en debug-info in the source).
 
 The code-dir has a JS-file for 4 modules:
 
@@ -9,6 +9,8 @@ The code-dir has a JS-file for 4 modules:
 - attendee.js
 - closeevent.js
 - verifier.js
+
+No personal attendee-information is shared over the Tangle (GDPR-proof), the attendee-token is secured with Elliptic Curve Encryption.
 
 Information between the modules is shared through a JSON-file with minimal values.
 

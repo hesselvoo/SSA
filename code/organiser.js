@@ -55,7 +55,7 @@ const payload0 = {
 
   title: privateOrgPrivateTitle,
   timestamp: new Date().toLocaleString(),
-  ePKey: privateOrgPrivateEventKey,
+  ePKey: eccryptoJS.bufferToHex(privateOrgPrivateEventKey),
 };
 
 const payload1 = {
@@ -72,7 +72,7 @@ const payload1 = {
   eventloc: eventLocation,
   eventdate: eventDate,
   eventtime: eventTime,
-  eventPublicKey: publicEventKey,
+  eventPublicKey: eccryptoJS.bufferToHex(publicEventKey),
 };
 
 function generateSeed(length) {
@@ -125,7 +125,7 @@ async function setupMam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
-  //DEBUG
+  //DEBUGINFO
   // console.log("mamMessage =================".red);
   // console.log(mamMessage);
   // console.log("channelState =================".red);
@@ -166,7 +166,7 @@ async function addEvent2Mam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
-  //DEBUG
+  //DEBUGINFO
   // console.log("channelState =================".red);
   // console.log(channelState);
   // console.log("mamMessage =================".red);
@@ -226,7 +226,7 @@ async function makeQRmam(
 
   saveQR(attendeeQRcode); // SEED    : plus sidekey?!
 
-  //DEBUG
+  //DEBUGINFO
   // console.log("channelQRState =================".red);
   // console.log(channelQRState);
 

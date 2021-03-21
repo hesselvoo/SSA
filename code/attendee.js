@@ -1,6 +1,8 @@
 //////////////////////////////////////////////////////////
 // Attendee attend-event-app
+// (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
+const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
 
 const {
   mamFetch,
@@ -11,7 +13,7 @@ const {
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
-const { Console } = require("console");
+// const { Console } = require("console");
 
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
@@ -19,6 +21,17 @@ const commonSideKey =
 let publicEventRoot = "";
 let attendancyAddress = "";
 let eventInformation = "";
+
+// Personal information to calculate the Merkle-root
+const personalFirstName = "Robert";
+const personalSurname = "Smith";
+const personalBirthdate = "19980820";
+const personalMail = "robertsmith@gmail.com";
+const personalDID = "did:example:123456789abcdefghi#key-1";
+const organisation = "International Red Cross";
+// for demo-purpose
+const personalMerkleRoot =
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
 
 function readQR() {
   // Try and load the QR-root from file - as substitute for QRscan from camera
@@ -31,7 +44,7 @@ function readQR() {
 // readQRmam
 async function readQRmam(qrSeed) {
   const mode = "restricted";
-  const sideKey = "DATE";
+  const sideKey = "DATE"; //TODO make it dynamic UTC-date
   let rootValue = "NON";
   let indexationKey = "";
 
@@ -55,6 +68,7 @@ async function readQRmam(qrSeed) {
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
+  //DEBUGINFO
   // console.log("MAMdata ===================".red);
   // console.log(`fetched : ${fetched.message}`.green);
   console.log("============================".yellow);
@@ -78,11 +92,12 @@ async function readPublicEventInfo(publicEventRoot) {
   const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    // console.log("Fetched : ", fMessage);
+    console.log("Fetched : ", fMessage);
     eventInformation = fMessage;
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
+  //DEBUGINFO
   // console.log("MAMdata ===================".red);
   // console.log(`fetched : ${fetched.message}`.green);
 }
@@ -106,20 +121,40 @@ function presentEventInfo(eventRecord) {
   console.log(`DID : ${eventRecord.orgdid}`);
 }
 
-// hashPersonalInfo
-
-// writeAttendancy2Tangle
-
-// compileVerifierQR
-
 async function mamInteract(eventQR) {
+  const payload0 = {
+    attendeeID: personalMerkleRoot,
+    remark: "Robert",
+    timestamp: new Date().toLocaleString(),
+  };
+
   await readQRmam(eventQR);
   if (publicEventRoot === "NON") {
+    //TODO also check for expiry
     console.log("Invalid eventRoot-address".red);
-  } else {
-    await readPublicEventInfo(publicEventRoot);
-    presentEventInfo(eventInformation);
+    return;
   }
+  await readPublicEventInfo(publicEventRoot);
+  presentEventInfo(eventInformation);
+
+  //TODO hashPersonalInfo
+  //setup&calculate merkle-root
+
+  // writeAttendancy2Tangle
+  console.log("Writing attendancy to Tangle ... ========".yellow);
+  const client = new SingleNodeClient(node);
+  const myIndex = attendancyAddress;
+
+  const sendResult = await sendData(
+    client,
+    myIndex,
+    Converter.utf8ToBytes(JSON.stringify(payload0))
+  );
+  console.log("Done writing attendancy to Tangle ... ========".yellow);
+  console.log(`Payload : ${JSON.stringify(payload0)}`);
+  console.log("Received Message Id", sendResult.messageId);
+
+  // compileVerifierQR
 }
 
 console.log("SSA-attendee-app".cyan);
