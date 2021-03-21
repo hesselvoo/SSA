@@ -94,7 +94,7 @@ async function readPublicEventInfo(publicEventRoot) {
   const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    console.log("Fetched : ", fMessage);
+    // console.log("Fetched : ", fMessage);
     eventInformation = fMessage;
   } else {
     console.log("Nothing was fetched from the MAM channel");
@@ -167,11 +167,11 @@ async function mamInteract(eventQR) {
     c: eccryptoJS.bufferToHex(encrypted2.ciphertext),
     d: eccryptoJS.bufferToHex(encrypted2.mac),
   };
-  console.log("enc2");
-  encrypted = JSON.stringify(payloadEnc);
-  console.log(encrypted);
-
   //DEBUGINFO
+  // console.log("enc2");
+  encrypted = JSON.stringify(payloadEnc);
+  // console.log(encrypted);
+
   console.log(`PublicKey : ${eventInformation.eventPublicKey}`.green);
   // const encrypted = attendeeData;
 
