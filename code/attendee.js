@@ -10,8 +10,14 @@ const {
   channelRoot,
   createChannel,
 } = require("@iota/mam-chrysalis.js");
-const { bufferToHex, hexToBuffer } = require("eccrypto-js");
-const eccryptoJS = require("eccrypto-js");
+const {
+  bufferToHex,
+  hexToBuffer,
+  sha256,
+  encrypt,
+  bufferToUtf8,
+  utf8ToBuffer,
+} = require("eccrypto-js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -133,9 +139,21 @@ function saveVerifierQR(verifierdata) {
   }
 }
 
+async function IDhash(mroot) {
+  let element = utf8ToBuffer(mroot);
+  element = await sha256(element);
+  return bufferToHex(element);
+}
+
 async function mamInteract(eventQR) {
+  const mh2 = await IDhash(personalMerkleRoot);
+  const merkleHash2 = await IDhash(mh2);
+  // console.log("pMR :".red);
+  // console.log(personalMerkleRoot);
+  // console.log(merkleHash2);
+  // console.log("===========");
   const payload0 = {
-    attendeeID: personalMerkleRoot,
+    attendeeID: merkleHash2,
     remark: "Robert", // optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
@@ -152,6 +170,10 @@ async function mamInteract(eventQR) {
   //TODO hashPersonalInfo
   //setup&calculate merkle-root
 
+  //DEBUGINFO
+  // console.log("Payloadcontent ==============".green);
+  // console.log(payload0);
+
   // writeAttendancy2Tangle
   console.log("Writing attendancy to Tangle ... ========".yellow);
   const client = new SingleNodeClient(node);
@@ -159,13 +181,13 @@ async function mamInteract(eventQR) {
 
   // encrypt attendeeData with eventPublicKey
   const attendeeData = JSON.stringify(payload0);
-  const pubKey = eccryptoJS.hexToBuffer(eventInformation.eventPublicKey);
-  const encrypted2 = await eccryptoJS.encrypt(pubKey, attendeeData);
+  const pubKey = hexToBuffer(eventInformation.eventPublicKey);
+  const encrypted2 = await encrypt(pubKey, attendeeData);
   const payloadEnc = {
-    a: eccryptoJS.bufferToHex(encrypted2.iv),
-    b: eccryptoJS.bufferToHex(encrypted2.ephemPublicKey),
-    c: eccryptoJS.bufferToHex(encrypted2.ciphertext),
-    d: eccryptoJS.bufferToHex(encrypted2.mac),
+    a: bufferToHex(encrypted2.iv),
+    b: bufferToHex(encrypted2.ephemPublicKey),
+    c: bufferToHex(encrypted2.ciphertext),
+    d: bufferToHex(encrypted2.mac),
   };
   //DEBUGINFO
   // console.log("enc2");
@@ -181,12 +203,18 @@ async function mamInteract(eventQR) {
     Converter.utf8ToBytes(encrypted)
   );
   console.log("Done writing attendancy to Tangle ... ========".yellow);
-  console.log(`Payload : `);
-  console.dir(encrypted);
+  //DEBUGINFO
+  // console.log(`Payload : `);
+  // console.dir(encrypted);
   console.log("Received Message Id", sendResult.messageId);
 
   // compileVerifierQR
-  // combine Hash(personalMerkleRoot)+publicEventRoot
+  // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
+  // Timestamp to check is it a recent QR
+  // CRC = last 5 digits of sha256, to check if QR is manipulated
+  const merkleHash = await IDhash(personalMerkleRoot);
+  const verifierQR = bufferToHex(merkleHash) + publicEventRoot;
+  console.log(`VerifierQR : ${verifierQR}`);
   // saveVerifierQR(attendeeQR);
 }
 

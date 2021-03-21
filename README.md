@@ -12,7 +12,7 @@ The code-dir has a JS-file for 4 modules:
 
 No personal attendee-information is shared over the Tangle (GDPR-proof), the attendee-token is secured with Elliptic Curve Encryption.
 
-Information between the modules is shared through a JSON-file with minimal values (in actual deployment with QR-code and scanner).
+Information between the modules is shared through a JSON-file with minimal values (in actual deployment this is done with QR-code and scanner or via iBeacon-function).
 
 It is all based upon IOTA-MAMchannels on the chrysalis-testnet. To be replaced with IOTA-Streams before final deployment.
 

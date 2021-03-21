@@ -3,15 +3,13 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const { bufferToHex } = require("eccrypto-js");
-const eccryptoJS = require("eccrypto-js");
+const { bufferToHex, generateKeyPair } = require("eccrypto-js");
 const {
   createChannel,
   createMessage,
   mamAttach,
   TrytesHelper,
 } = require("@iota/mam-chrysalis.js");
-const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
 const crypto = require("crypto");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
@@ -20,7 +18,7 @@ const colors = require("colors");
 const node = "https://api.lb-0.testnet.chrysalis2.com/";
 
 // the privatekey and the publickey to encrypt/decrypt attendancy-transaction
-const keyPair = eccryptoJS.generateKeyPair();
+const keyPair = generateKeyPair();
 const privateOrgPrivateEventKey = keyPair.privateKey;
 const publicEventKey = keyPair.publicKey;
 
@@ -55,7 +53,7 @@ const payload0 = {
 
   title: privateOrgPrivateTitle,
   timestamp: new Date().toLocaleString(),
-  ePKey: eccryptoJS.bufferToHex(privateOrgPrivateEventKey),
+  ePKey: bufferToHex(privateOrgPrivateEventKey),
 };
 
 const payload1 = {
@@ -72,7 +70,7 @@ const payload1 = {
   eventloc: eventLocation,
   eventdate: eventDate,
   eventtime: eventTime,
-  eventPublicKey: eccryptoJS.bufferToHex(publicEventKey),
+  eventPublicKey: bufferToHex(publicEventKey),
 };
 
 function generateSeed(length) {
