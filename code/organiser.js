@@ -2,6 +2,8 @@
 // Organiser init-event-app
 //////////////////////////////////////////////////////////
 
+const { bufferToHex } = require("eccrypto-js");
+const eccryptoJS = require("eccrypto-js");
 const {
   createChannel,
   createMessage,
@@ -16,10 +18,10 @@ const colors = require("colors");
 
 const node = "https://api.lb-0.testnet.chrysalis2.com/";
 
-const privateOrgPrivateTitle = "Interreg Blockchain-event";
-const privateOrgPrivateEventKey = "1928374655367182725143759";
-// the privatekey which generates the publickey to encrypt attendancy-transaction
-const publicEventKey = "92837151423132255588337736251662";
+const privateOrgPrivateTitle = "Interreg Blockchain-event midterm";
+// the privatekey and the publickey to encrypt/decrypt attendancy-transaction
+let privateOrgPrivateEventKey = "";
+let publicEventKey = "";
 
 const organiserName = "Courseware Ltd.";
 const organiserAddress = "53 Pumbertonstreet";
@@ -254,7 +256,9 @@ console.log("SSA-organiser-app".cyan);
 // Unique SEED per event
 eventSEED = prompt("Event SEED -81 UPPERCASE A-Z,9- (*=default): ");
 // password for the private organiser MAMrecord (first in the MAM)
-organiserKey = prompt("OrganiserKey -UPPERCASE A-Z,9- (*=default): ");
+organiserKey = prompt(
+  "Secure organiserKey -UPPERCASE A-Z,9- (*=default for demo): "
+);
 
 if (eventSEED === "*") {
   // generate default for debugging -for lazy people-
@@ -262,9 +266,19 @@ if (eventSEED === "*") {
 }
 if (organiserKey === "*") {
   // for first record of MAM (which is private)
+  // for extra encrypting the record which holds the eventPrivatekey
   organiserKey = commonSideKey;
 }
+
+const keyPair = eccryptoJS.generateKeyPair();
+privateOrgPrivateEventKey = keyPair.privateKey;
+publicEventKey = keyPair.publicKey;
+
 console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
+console.log(
+  `PrivateEventKey = ${privateOrgPrivateEventKey.toString("hex")}`.cyan
+);
+console.log(`PublicEventKey = ${publicEventKey.toString("hex")}`.cyan);
 
 setupMam(payload0).then(() => makeMamEntryPointAttendee());
