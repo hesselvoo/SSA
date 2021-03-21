@@ -10,7 +10,7 @@ const {
   channelRoot,
   createChannel,
 } = require("@iota/mam-chrysalis.js");
-const { bufferToHex, hexToBuffer, arrayToUtf8 } = require("eccrypto-js");
+const { bufferToHex, hexToBuffer } = require("eccrypto-js");
 const eccryptoJS = require("eccrypto-js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
@@ -136,7 +136,7 @@ function saveVerifierQR(verifierdata) {
 async function mamInteract(eventQR) {
   const payload0 = {
     attendeeID: personalMerkleRoot,
-    remark: "Robert",
+    remark: "Robert", // optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 
@@ -186,8 +186,8 @@ async function mamInteract(eventQR) {
   console.log("Received Message Id", sendResult.messageId);
 
   // compileVerifierQR
-
-  //saveVerifierQR(attendeeQR);
+  // combine Hash(personalMerkleRoot)+publicEventRoot
+  // saveVerifierQR(attendeeQR);
 }
 
 console.log("SSA-attendee-app".cyan);

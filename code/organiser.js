@@ -11,7 +11,7 @@ const {
   mamAttach,
   TrytesHelper,
 } = require("@iota/mam-chrysalis.js");
-const crypto = require("crypto");
+// const crypto = require("crypto");
 const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
