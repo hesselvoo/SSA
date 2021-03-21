@@ -1,5 +1,6 @@
 //////////////////////////////////////////////////////////
 // Organiser init-event-app
+// (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
 const { bufferToHex } = require("eccrypto-js");
@@ -18,11 +19,12 @@ const colors = require("colors");
 
 const node = "https://api.lb-0.testnet.chrysalis2.com/";
 
-const privateOrgPrivateTitle = "Interreg Blockchain-event midterm";
 // the privatekey and the publickey to encrypt/decrypt attendancy-transaction
-let privateOrgPrivateEventKey = "";
-let publicEventKey = "";
+const keyPair = eccryptoJS.generateKeyPair();
+const privateOrgPrivateEventKey = keyPair.privateKey;
+const publicEventKey = keyPair.publicKey;
 
+// public organiserdetails
 const organiserName = "Courseware Ltd.";
 const organiserAddress = "53 Pumbertonstreet";
 const organiserPostcode = "23788";
@@ -32,6 +34,8 @@ const organiserTelephone = "01 234 56 789";
 const organiserMail = "info@courseware.com";
 const organiserDID = "did:example:123456789abcdefghi#key-1";
 
+// public eventdetails
+const privateOrgPrivateTitle = "Interreg Blockchain-event midterm";
 const eventName = "Interreg Bling Midterm-conference";
 const eventDate = "March 9th 2021";
 const eventTime = "10:00 - 16:30";
@@ -47,9 +51,11 @@ let attendeeQRcode = "";
 
 const payload0 = {
   // Information for the private-organiser-Mam-record
+  //TODO make encryptable
+
   title: privateOrgPrivateTitle,
   timestamp: new Date().toLocaleString(),
-  eventPrivateKey: privateOrgPrivateEventKey,
+  ePKey: privateOrgPrivateEventKey,
 };
 
 const payload1 = {
@@ -119,10 +125,12 @@ async function setupMam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
+  //DEBUG
   // console.log("mamMessage =================".red);
   // console.log(mamMessage);
   // console.log("channelState =================".red);
   // console.log(channelState);
+
   console.log("Payload =================".red);
   console.log(JSON.stringify(payload));
   console.log("=================".red);
@@ -158,6 +166,7 @@ async function addEvent2Mam(payload) {
     TrytesHelper.fromAscii(JSON.stringify(payload))
   );
 
+  //DEBUG
   // console.log("channelState =================".red);
   // console.log(channelState);
   // console.log("mamMessage =================".red);
@@ -186,7 +195,7 @@ async function makeQRmam(
   attendanceNotificationKey,
   expiryDateTime
 ) {
-  //This is a MAM with only 1 restricted-record:
+  // This is a MAM with only 1 restricted-record:
   // publicRootEventMAM -as link to Eventinformation
   // indexation - as tag for attendance-transactions/notifications
   // timestamp - expiryDateTime
@@ -217,6 +226,7 @@ async function makeQRmam(
 
   saveQR(attendeeQRcode); // SEED    : plus sidekey?!
 
+  //DEBUG
   // console.log("channelQRState =================".red);
   // console.log(channelQRState);
 
@@ -241,21 +251,23 @@ async function makeQRmam(
 function makeMamEntryPointAttendee() {
   let attendanceNotificationKey = "";
   const publicEventRoot = channelState.nextRoot;
-  const expiryDateTime = new Date();
+  const expiryDateTime = new Date(); //TODO + 15min? variable to set by organiser
 
   attendanceNotificationKey = generateSeed(64);
   console.log(`nextroot : ${channelState.nextRoot}`.red);
   makeQRmam(channelState.nextRoot, attendanceNotificationKey, expiryDateTime);
 
   addEvent2Mam(payload1);
-  // sla nextroot op om deelnemerslijst te appenden
+  // save nextroot to append attendee-list in closeevent.js
   saveChannelState();
 }
 
 console.log("SSA-organiser-app".cyan);
 // Unique SEED per event
-eventSEED = prompt("Event SEED -81 UPPERCASE A-Z,9- (*=default): ");
-// password for the private organiser MAMrecord (first in the MAM)
+eventSEED = prompt(
+  "Event SEED -81 UPPERCASE A-Z,9- (*=random-auto-generate): "
+);
+// password for the private organiser MAMrecord (first record in the MAM)
 organiserKey = prompt(
   "Secure organiserKey -UPPERCASE A-Z,9- (*=default for demo): "
 );
@@ -270,9 +282,12 @@ if (organiserKey === "*") {
   organiserKey = commonSideKey;
 }
 
-const keyPair = eccryptoJS.generateKeyPair();
-privateOrgPrivateEventKey = keyPair.privateKey;
-publicEventKey = keyPair.publicKey;
+async function run() {
+  // interact with IOTA-MAM-V0
+  // setupMam(payload0).then(() => makeMamEntryPointAttendee());
+  await setupMam(payload0);
+  await makeMamEntryPointAttendee();
+}
 
 console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
@@ -281,4 +296,4 @@ console.log(
 );
 console.log(`PublicEventKey = ${publicEventKey.toString("hex")}`.cyan);
 
-setupMam(payload0).then(() => makeMamEntryPointAttendee());
+run();
