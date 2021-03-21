@@ -10,6 +10,8 @@ const {
   channelRoot,
   createChannel,
 } = require("@iota/mam-chrysalis.js");
+const { bufferToHex, hexToBuffer, arrayToUtf8 } = require("eccrypto-js");
+const eccryptoJS = require("eccrypto-js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -121,6 +123,16 @@ function presentEventInfo(eventRecord) {
   console.log(`DID : ${eventRecord.orgdid}`);
 }
 
+function saveVerifierQR(verifierdata) {
+  // Store QR-code for verifier so we can use it in verifier.js
+  console.log("Save VerifierQR >>>>>>>>".green);
+  try {
+    fs.writeFileSync("./attendeeQR.json", verifierdata);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function mamInteract(eventQR) {
   const payload0 = {
     attendeeID: personalMerkleRoot,
@@ -145,16 +157,37 @@ async function mamInteract(eventQR) {
   const client = new SingleNodeClient(node);
   const myIndex = attendancyAddress;
 
+  // encrypt attendeeData with eventPublicKey
+  const attendeeData = JSON.stringify(payload0);
+  const pubKey = eccryptoJS.hexToBuffer(eventInformation.eventPublicKey);
+  const encrypted2 = await eccryptoJS.encrypt(pubKey, attendeeData);
+  const payloadEnc = {
+    a: eccryptoJS.bufferToHex(encrypted2.iv),
+    b: eccryptoJS.bufferToHex(encrypted2.ephemPublicKey),
+    c: eccryptoJS.bufferToHex(encrypted2.ciphertext),
+    d: eccryptoJS.bufferToHex(encrypted2.mac),
+  };
+  console.log("enc2");
+  encrypted = JSON.stringify(payloadEnc);
+  console.log(encrypted);
+
+  //DEBUGINFO
+  console.log(`PublicKey : ${eventInformation.eventPublicKey}`.green);
+  // const encrypted = attendeeData;
+
   const sendResult = await sendData(
     client,
     myIndex,
-    Converter.utf8ToBytes(JSON.stringify(payload0))
+    Converter.utf8ToBytes(encrypted)
   );
   console.log("Done writing attendancy to Tangle ... ========".yellow);
-  console.log(`Payload : ${JSON.stringify(payload0)}`);
+  console.log(`Payload : `);
+  console.dir(encrypted);
   console.log("Received Message Id", sendResult.messageId);
 
   // compileVerifierQR
+
+  //saveVerifierQR(attendeeQR);
 }
 
 console.log("SSA-attendee-app".cyan);
