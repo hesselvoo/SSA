@@ -126,4 +126,5 @@ temp/
 
 # Parameter-saving files
 QRcode.json
+Wallet.json
 channelState.json

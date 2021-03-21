@@ -11,8 +11,8 @@ const {
   mamAttach,
   TrytesHelper,
 } = require("@iota/mam-chrysalis.js");
-// const crypto = require("crypto");
 const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
+const crypto = require("crypto");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -109,6 +109,19 @@ function saveQR(qrcode) {
   console.log("Save QRcode >>>>>>>>".green);
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function saveSEEDnPassword() {
+  // save eventSEED and eventPassword in (imaginery) organiserswallet
+
+  eventWalletInfo = `{\n"seed":"${eventSEED}",\n"password":"${organiserKey}"\n}`;
+
+  console.log("Save EventSEED >>>>>>>>".green);
+  try {
+    fs.writeFileSync("./Wallet.json", eventWalletInfo);
   } catch (e) {
     console.error(e);
   }
@@ -289,6 +302,7 @@ async function run() {
   await makeMamEntryPointAttendee();
 }
 
+saveSEEDnPassword();
 console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
 console.log(
