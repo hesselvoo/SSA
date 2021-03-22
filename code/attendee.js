@@ -18,6 +18,7 @@ const {
   bufferToUtf8,
   utf8ToBuffer,
 } = require("eccrypto-js");
+const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -133,22 +134,22 @@ function saveVerifierQR(verifierdata) {
   // Store QR-code for verifier so we can use it in verifier.js
   console.log("Save VerifierQR >>>>>>>>".green);
   try {
-    fs.writeFileSync("./attendeeQR.json", verifierdata);
+    fs.writeFileSync("./verifierQR.json", verifierdata);
   } catch (e) {
     console.error(e);
   }
 }
 
-async function IDhash(mroot) {
+async function hashHash(mroot) {
   let element = utf8ToBuffer(mroot);
   element = await sha256(element);
   return bufferToHex(element);
 }
 
 async function mamInteract(eventQR) {
-  const mh2 = await IDhash(personalMerkleRoot);
-  const merkleHash2 = await IDhash(mh2);
-  // console.log("pMR :".red);
+  const mh2 = await hashHash(personalMerkleRoot);
+  const merkleHash2 = await hashHash(mh2);
+  // console.log("personalMerkleRoot :".red);
   // console.log(personalMerkleRoot);
   // console.log(merkleHash2);
   // console.log("===========");
@@ -168,7 +169,8 @@ async function mamInteract(eventQR) {
   presentEventInfo(eventInformation);
 
   //TODO hashPersonalInfo
-  //setup&calculate merkle-root
+  // setup&calculate merkle-root
+  // include publicEventRoot to make this token unique per event
 
   //DEBUGINFO
   // console.log("Payloadcontent ==============".green);
@@ -212,10 +214,14 @@ async function mamInteract(eventQR) {
   // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
   // Timestamp to check is it a recent QR
   // CRC = last 5 digits of sha256, to check if QR is manipulated
-  const merkleHash = await IDhash(personalMerkleRoot);
-  const verifierQR = bufferToHex(merkleHash) + publicEventRoot;
-  console.log(`VerifierQR : ${verifierQR}`);
-  // saveVerifierQR(attendeeQR);
+  const merkleHash = await hashHash(personalMerkleRoot);
+  const nowEpoch = luxon.DateTime.now().toMillis();
+  let verifierQR = bufferToHex(merkleHash) + publicEventRoot + nowEpoch;
+  const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
+  verifierQR += crcCheck.slice(-5);
+  verifierQR = verifierQR.toUpperCase();
+  console.log(`VerifierQR : ${verifierQR}`.yellow);
+  saveVerifierQR(verifierQR);
 }
 
 console.log("SSA-attendee-app".cyan);

@@ -128,3 +128,4 @@ temp/
 QRcode.json
 Wallet.json
 channelState.json
+verifierQR.json
