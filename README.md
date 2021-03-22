@@ -18,6 +18,19 @@ The code-dir has a JS-file for 4 modules:
 
 **verifier.js** : reads the verifierQR and checks on the Tangle at the event if the attendee was registered.
 
+## Getting started
+
+To start playing with these examples run the following commands in your terminal:
+
+```
+git clone https://github.com/IoTAdri/nodeSSA.git
+cd nodeSSA
+npm install # or yarn install
+node code/organiser.js
+```
+
+You should see the SSA-organiser-app. You can answer both prompts with \* [enter] and then a demo-event will be registered on the Tangle.
+
 ---
 
 No personal attendee-information is shared over the Tangle (GDPR-proof), the attendee-token is secured with Elliptic Curve Encryption (comparable with RSA-3072).
@@ -26,6 +39,10 @@ Information between the modules is shared through a JSON-file with minimal value
 
 It is all based upon IOTA-MAMchannels on the chrysalis-testnet. To be replaced with IOTA-Streams before final deployment.
 
-> (the code can ALWAYS use some refactoring -it's a PoC- so PR's are welcome)
+> (the code can ALWAYS use some refactoring/cleanup -it's a PoC- so PR's are welcome)
 
 (c) Adri Wischmann 2021
+
+```
+
+```

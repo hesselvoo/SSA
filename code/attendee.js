@@ -42,6 +42,7 @@ const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
   "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
+let eventPersonalMerkleRoot;
 
 function readQR() {
   // Try and load the QR-root from file - as substitute for QRscan from camera
@@ -145,12 +146,6 @@ async function hashHash(mroot) {
 }
 
 async function mamInteract(eventQR) {
-  const mh2 = await hashHash(personalMerkleRoot);
-  const merkleHash2 = await hashHash(mh2);
-  // console.log("personalMerkleRoot :".red);
-  // console.log(personalMerkleRoot);
-  // console.log(merkleHash2);
-  // console.log("===========");
   const payload0 = {
     attendeeID: merkleHash2,
     remark: "Robert", //HINT optional, can remain empty. Will be striped by closeevent.
@@ -168,7 +163,16 @@ async function mamInteract(eventQR) {
 
   //TODO hashPersonalInfo
   // setup&calculate merkle-root
+
   // include publicEventRoot to make this token unique per event
+  eventPersonalMerkleRoot = personalMerkleRoot + publicEventRoot;
+  const mh2 = await hashHash(eventPersonalMerkleRoot);
+  const merkleHash2 = await hashHash(mh2);
+  //DEBUGINFO
+  // console.log("eventPersonalMerkleRoot :".red);
+  // console.log(eventPersonalMerkleRoot);
+  // console.log(merkleHash2);
+  // console.log("===========");
 
   //DEBUGINFO
   // console.log("Payloadcontent ==============".green);
@@ -212,7 +216,7 @@ async function mamInteract(eventQR) {
   // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
   // Timestamp to check is it a recent QR
   // CRC = last 5 digits of sha256, to check if QR is manipulated
-  const merkleHash = await hashHash(personalMerkleRoot);
+  const merkleHash = await hashHash(eventPersonalMerkleRoot);
   const nowEpoch = luxon.DateTime.now().toMillis();
   let verifierQR = bufferToHex(merkleHash) + publicEventRoot + nowEpoch;
   const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
