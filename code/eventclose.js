@@ -3,7 +3,7 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const { bufferToHex } = require("eccrypto-js");
+const { bufferToHex, hexToBuffer, decrypt } = require("eccrypto-js");
 const eccryptoJS = require("eccrypto-js");
 const {
   createChannel,
@@ -14,7 +14,7 @@ const {
   TrytesHelper,
   channelRoot,
 } = require("@iota/mam-chrysalis.js");
-const { retrievedata, SingleNodeClient, Converter } = require("@iota/iota.js");
+const { retrieveData, SingleNodeClient, Converter } = require("@iota/iota.js");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -61,7 +61,7 @@ async function readPrivateOrganiserInfo() {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
     // console.log("Fetched : ", fMessage);
     eventTitle = fMessage.title;
-    privateOrgPrivateEventKey = fMessage.ePKey;
+    privateOrgPrivateEventKey = hexToBuffer(fMessage.ePKey);
     publicEventRoot = fetched.nextRoot;
   } else {
     console.log("Nothing was fetched from the MAM channel");
@@ -130,18 +130,49 @@ async function showAlist(attendeeIndex) {
   console.log("===============".red);
   const aList = await attendeeList(attendeeIndex);
   for (let i = 0; i < aList.count; i++) {
-    const element = aList[i];
     console.log(`${i} : ${aList.messageIds[i]}`);
   }
-  console.log("===============".red);
+  // showAttendeeCount
+  console.log(`Total : ${aList.count} ===============`.red);
 }
 
-// makeAttendeeList
-// showAttendeeCount
-// readAttendeeRecord, decrypt, extract AttendeeID, add2List
-// appendAttendeeList2MAM
-// appendCloseMessage -include closingTimestamp
-// writeMAMstate for appending extra information
+async function getAttendee(attendeeMessageID) {
+  // retrieve attendeeTransaction from Tangle
+  const client = new SingleNodeClient(node);
+  // console.log(`Retrieving : ${attendeeMessageID}`.dim);
+  const transactionDataRAW = await retrieveData(client, attendeeMessageID);
+  transactionData = JSON.parse(Converter.bytesToUtf8(transactionDataRAW.data));
+  //DEBUGINFO
+  // console.log(`Raw : ${transactionData}`);
+  // console.dir(transactionData);
+
+  if (transactionData) {
+    const encryptedData = {
+      iv: hexToBuffer(transactionData.a),
+      ephemPublicKey: hexToBuffer(transactionData.b),
+      ciphertext: hexToBuffer(transactionData.c),
+      mac: hexToBuffer(transactionData.d),
+    };
+    decrypted = await decrypt(privateOrgPrivateEventKey, encryptedData);
+    return decrypted;
+  }
+}
+
+async function closeEvent(attendeeIndex) {
+  // makelist, writeList2MAM, writeCloseMessage
+  const aList = await attendeeList(attendeeIndex);
+  // readAttendeeRecord, decrypt, extract AttendeeID, add2List
+  for (let i = 0; i < aList.count; i++) {
+    let attendeeToken = await getAttendee(aList.messageIds[i]);
+    let aTokenJson = JSON.parse(attendeeToken);
+    console.log(
+      `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+    );
+  }
+  // appendAttendeeList2MAM
+  // appendCloseMessage -include closingTimestamp
+  // writeMAMstate for appending extra information
+}
 
 async function run() {
   console.log("Event-close-app".cyan);
@@ -168,7 +199,7 @@ async function run() {
     }
     if (menuChoice == "c") {
       // close the event
-      // makelist, writeList2MAM, writeCloseMessage
+      await closeEvent(attendancyAddress);
     }
     if (menuChoice == "q") {
       // close the application

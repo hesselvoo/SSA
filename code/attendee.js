@@ -232,4 +232,6 @@ console.log(`QRcode from file = ${readQRcode}`.yellow);
 let eventQR = prompt("Event QR-code (*=savedversion): ");
 if (eventQR === "*") eventQR = readQRcode;
 
+//TODO choose from 3 personas for demopurposes
+
 mamInteract(eventQR);
