@@ -26,7 +26,8 @@ const colors = require("colors");
 
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
-  "SSACOMMONKEY999999999999999999999999999999999999999999999999999999999999999999999";
+  "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
+
 let publicEventRoot = "";
 let attendancyAddress = "";
 let eventInformation = "";
@@ -50,7 +51,6 @@ function readQR() {
   } catch (err) {}
 }
 
-// readQRmam
 async function readQRmam(qrSeed) {
   const mode = "restricted";
   const sideKey = "DATE"; //TODO make it dynamic UTC-date
@@ -85,7 +85,6 @@ async function readQRmam(qrSeed) {
   attendancyAddress = indexationKey;
 }
 
-// readPublicEventInfo
 async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
@@ -111,7 +110,6 @@ async function readPublicEventInfo(publicEventRoot) {
   // console.log(`fetched : ${fetched.message}`.green);
 }
 
-// presentEventInfo
 function presentEventInfo(eventRecord) {
   console.log("=================================".red);
   console.log("Event :".cyan);
