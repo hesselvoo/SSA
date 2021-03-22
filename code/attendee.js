@@ -155,7 +155,7 @@ async function mamInteract(eventQR) {
   // console.log("===========");
   const payload0 = {
     attendeeID: merkleHash2,
-    remark: "Robert", // optional, can remain empty. Will be striped by closeevent.
+    remark: "Robert", //HINT optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 

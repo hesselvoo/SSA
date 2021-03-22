@@ -11,6 +11,7 @@ const {
   TrytesHelper,
 } = require("@iota/mam-chrysalis.js");
 const crypto = require("crypto");
+const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -43,16 +44,17 @@ let eventSEED = "";
 let organiserKey = "";
 let channelState;
 const commonSideKey =
-  "SSACOMMONKEY999999999999999999999999999999999999999999999999999999999999999999999";
+  "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
 
 let attendeeQRcode = "";
+let attendanceNotificationKey = "";
 
 const payload0 = {
   // Information for the private-organiser-Mam-record
   //TODO make encryptable
 
   title: privateOrgPrivateTitle,
-  timestamp: new Date().toLocaleString(),
+  timestamp: luxon.DateTime.now().toISO(),
   ePKey: bufferToHex(privateOrgPrivateEventKey),
 };
 
@@ -102,8 +104,6 @@ function saveChannelState() {
 function saveQR(qrcode) {
   // save QRcode so we can use it in attendee.js
 
-  //TODO add expirationtime in QR-code so attendee-app signals expired
-
   console.log("Save QRcode >>>>>>>>".green);
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
@@ -115,7 +115,13 @@ function saveQR(qrcode) {
 function saveSEEDnPassword() {
   // save eventSEED and eventPassword in (imaginery) organiserswallet
 
-  eventWalletInfo = `{\n"seed":"${eventSEED}",\n"password":"${organiserKey}"\n}`;
+  //eventWalletInfo = `{\n"seed":"${eventSEED}",\n"password":"${organiserKey}"\n}`;
+  eventWalletInfo = `{
+    "seed":"${eventSEED}",
+    "password":"${organiserKey}",
+    "indexation":"${attendanceNotificationKey}",
+    "aQR":"${attendeeQRcode}"
+  }`;
 
   console.log("Save EventSEED >>>>>>>>".green);
   try {
@@ -260,17 +266,23 @@ async function makeQRmam(
 }
 
 function makeMamEntryPointAttendee() {
-  let attendanceNotificationKey = "";
+  //BUG let attendanceNotificationKey = "";
   const publicEventRoot = channelState.nextRoot;
-  const expiryDateTime = new Date(); //TODO + 15min? variable to set by organiser
+  // const expiryDateTime = new Date(); //TODO + 15min? variable to set by organiser
+  const expiryDateTime = luxon.DateTime.now().plus({ minutes: 15 }); // to be set by organiser
 
   attendanceNotificationKey = generateSeed(64);
   console.log(`nextroot : ${channelState.nextRoot}`.red);
-  makeQRmam(channelState.nextRoot, attendanceNotificationKey, expiryDateTime);
+  makeQRmam(
+    channelState.nextRoot,
+    attendanceNotificationKey,
+    expiryDateTime.toISO()
+  );
 
   addEvent2Mam(payload1);
   // save nextroot to append attendee-list in closeevent.js
   saveChannelState();
+  saveSEEDnPassword();
 }
 
 console.log("SSA-organiser-app".cyan);
@@ -300,7 +312,7 @@ async function run() {
   await makeMamEntryPointAttendee();
 }
 
-saveSEEDnPassword();
+// saveSEEDnPassword();
 console.log(`EventSEED = ${eventSEED}`.green);
 console.log(`OrganiserKey = ${organiserKey}`.green);
 console.log(
