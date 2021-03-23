@@ -1,7 +1,7 @@
 # Node-SSA-app
 
 This is the Self Sovereign Attendancy application.
-Written for NodeJS as a PoC+ with securitymeasures builtin (and with LOTS of remarks en debuginfo in the source -over 70%-).
+Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (and with LOTS of remarks en debuginfo in the source -over 70%-).
 
 The code-dir has a JS-file for 4 modules:
 
@@ -29,7 +29,7 @@ npm install # or yarn install
 node code/organiser.js
 ```
 
-You should see the SSA-organiser-app. You can answer both prompts with \* [enter] and then a demo-event will be registered on the Tangle.
+You should see the SSA-organiser-app. You can answer both prompts with \* `[enter]` and then a demo-event will be registered on the IOTA-Tangle.
 
 ---
 
@@ -39,7 +39,7 @@ Information between the modules is shared through a JSON-file with minimal value
 
 It is all based upon IOTA-MAMchannels on the chrysalis-testnet. To be replaced with IOTA-Streams before final deployment.
 
-> (the code can ALWAYS use some refactoring/cleanup -it's a PoC- so PR's are welcome)
+> (this code is a startingpoint and can ALWAYS use some refactoring/cleanup -it's a PoC- so PR's are welcome)
 
 (c) Adri Wischmann 2021
 

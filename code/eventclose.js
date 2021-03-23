@@ -159,15 +159,28 @@ async function getAttendee(attendeeMessageID) {
 }
 
 async function detailedList(attendeeIndex) {
-  // makelist, writeList2MAM, writeCloseMessage
+  // show list of attendees with details
   const aList = await attendeeList(attendeeIndex);
-  // readAttendeeRecord, decrypt, extract AttendeeID, add2List
+  // readAttendeeRecord, decrypt, extract AttendeeID, timestamp
   for (let i = 0; i < aList.count; i++) {
     let attendeeToken = await getAttendee(aList.messageIds[i]);
     let aTokenJson = JSON.parse(attendeeToken);
     console.log(
       `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
     );
+  }
+}
+
+async function closeEvent(attendeeIndex) {
+  // makelist, writeList2MAM, writeCloseMessage
+  const aList = await attendeeList(attendeeIndex);
+  // readAttendeeRecord, decrypt, extract AttendeeID, add2List
+  for (let i = 0; i < aList.count; i++) {
+    let attendeeToken = await getAttendee(aList.messageIds[i]);
+    let aTokenJson = JSON.parse(attendeeToken);
+    // console.log(
+    //   `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+    // );
   }
   // appendAttendeeList2MAM
   // appendCloseMessage -include closingTimestamp
