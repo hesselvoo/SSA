@@ -176,11 +176,12 @@ async function detailedList(attendeeIndex) {
       );
     } else {
       console.log(
-        `${i} : ${aList.messageIds[i]} - DOUBLE ID \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+        `${i} : ${aList.messageIds[i]} - DOUBLE ID - \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
           .brightRed
       );
     }
   }
+  console.log(` Total unique IDs : ${idList.length()} =========`);
 }
 
 async function closeEvent(attendeeIndex) {

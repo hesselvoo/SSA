@@ -3,7 +3,11 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const { mamFetch, TrytesHelper } = require("@iota/mam-chrysalis.js");
+const {
+  mamFetch,
+  TrytesHelper,
+  mamFetchAll,
+} = require("@iota/mam-chrysalis.js");
 const { Converter } = require("@iota/iota.js");
 const { sha256, utf8ToBuffer, bufferToHex } = require("eccrypto-js");
 // const crypto = require("crypto");
@@ -20,6 +24,7 @@ let verificationQR = "";
 let attendeeToken = "";
 let qrTime = "";
 let eventInformation = "";
+let nextMAMRoot = "";
 
 async function hashHash(hashData) {
   let element = utf8ToBuffer(hashData);
@@ -59,9 +64,15 @@ async function checkQR(code) {
     qrTime = luxon.DateTime.fromMillis(+timecode);
     nowTime = luxon.DateTime.now();
     let timeDiff = nowTime.diff(qrTime);
-    if (timeDiff.as(`minutes`) > 10) console.log(`Suspicious behaviour :`.red);
+    if (timeDiff.as(`minutes`) > 10)
+      console.log(
+        `Suspicious behaviour : QR-code is older than 10 minutes!`.underline
+          .brightRed
+      );
     console.log(
-      `QR-code was generated ${timeDiff.as(`minutes`)} minutes ago`.yellow
+      `QR-code was generated ${parseInt(
+        timeDiff.as(`minutes`)
+      )} minutes ago at: ${qrTime.toISO()}`.yellow
     );
     return true;
   }
@@ -72,25 +83,28 @@ async function checkQR(code) {
 async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
-
-  console.log("Fetching from tangle with this information :");
-  console.log(`Node : ${node}`.yellow);
-  console.log(`EventRoot : ${publicEventRoot}`.yellow);
-  console.log(`mode : ${mode}`.yellow);
-  console.log(`sideKey : ${sideKey}`.yellow);
+  //DEBUGINFO
+  //   console.log("Fetching from tangle with this information :");
+  //   console.log(`Node : ${node}`.yellow);
+  //   console.log(`EventRoot : ${publicEventRoot}`.yellow);
+  //   console.log(`mode : ${mode}`.yellow);
+  //   console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
   console.log("Fetching from tangle, please wait...");
   const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
+    nextMAMRoot = fetched.nextRoot;
     //DEBUGINFO
     // console.log("MAMdata ===================".red);
     // console.log(`fetched : ${fetched.message}`.green);
+    // console.log(`fmessage : ${fMessage}`);
+    // console.log(`nextMAMRoot : ${nextMAMRoot}`);
     return fMessage;
   }
   console.log("Nothing was fetched from the MAM channel".red);
-  return "error";
+  return;
 }
 
 function presentEventInfo(eventRecord) {
@@ -111,6 +125,61 @@ function presentEventInfo(eventRecord) {
   console.log(`DID : ${eventRecord.orgdid}`);
 }
 
+async function loadAttendeeTokens() {
+  // readAttendeeList -till ClosedMessage
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+  let aList = [];
+  //DEBUGINFO
+  //   console.log("Fetching attendeeIDs from tangle with this information :");
+  //   console.log(`Node : ${node}`.yellow);
+  //   console.log(`EventRoot : ${nextMAMRoot}`.yellow);
+  //   console.log(`mode : ${mode}`.yellow);
+  //   console.log(`sideKey : ${sideKey}`.yellow);
+
+  // Try fetching from MAM
+  let readMAM = true;
+  while (readMAM) {
+    // readMAMrecord
+    // console.log("ReadMAM ===========".red);
+    const fetched = await mamFetch(node, nextMAMRoot, mode, sideKey);
+    // console.log(`fetched : ${fetched.message}`.green);
+    let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
+    // console.dir(`Message : ${fMessage}`);
+    if (fetched) {
+      let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
+      //   console.log(`fMessage : ${fMessage}`.cyan);
+      nextMAMRoot = fetched.nextRoot;
+      //DEBUGINFO
+      //   console.log("MAMdata ===================".red);
+      //   console.log(`fetched : ${fMessage.count}`.green);
+      if (fMessage.message == "Event closed") {
+        console.log(
+          `Eventregistration closed at : ${fMessage.date} =====`.cyan
+        );
+        readMAM = false;
+      } else {
+        aList = aList.concat(fMessage.ids);
+        // console.log("attendeeList ========");
+        // console.log(`aList : ${aList}`.yellow);
+      }
+    }
+  }
+  return aList;
+}
+
+function checkAttended(ID, idList) {
+  // check if attendeeID is on the list of registeredIDs
+  ID = ID + "a";
+  if (idList.indexOf(ID) === -1) {
+    console.log(`ID : ${ID} was not registered at this event!`.brightRed);
+    return false;
+  } else {
+    console.log(`ID : ${ID} has attended this event.`.green);
+    return true;
+  }
+}
+
 async function run() {
   console.log("SSA-verifier-app".cyan);
   verificationQR = readQR();
@@ -122,12 +191,14 @@ async function run() {
   } else {
     // readEventInfo
     eventInformation = await readPublicEventInfo(publicEventRoot);
-    // show eventinfo
-    if (!eventInformation == "error") {
+    // console.log(eventInformation);
+    if (eventInformation.eventPublicKey.length > 0) {
+      // show eventinfo
       presentEventInfo(eventInformation);
+      const attendeeList = await loadAttendeeTokens();
+      // checkAttendeeOnList
+      checkAttended(attendeeToken, attendeeList);
     }
-    // readAttendeeList -till ClosedMessage
-    // checkAttendeeOnList
   }
 }
 
