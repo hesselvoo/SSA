@@ -131,12 +131,12 @@ async function showAlist(attendeeIndex) {
   // show attendeeTransactionList
 
   console.log("===============".red);
-  const aList = await attendeeList(attendeeIndex);
-  for (let i = 0; i < aList.count; i++) {
-    console.log(`${i} : ${aList.messageIds[i]}`);
+  const mList = await attendeeList(attendeeIndex);
+  for (let i = 0; i < mList.count; i++) {
+    console.log(`${i} : ${mList.messageIds[i]}`);
   }
   // showAttendeeCount
-  console.log(`Total : ${aList.count} ===============`.red);
+  console.log(`Total : ${mList.count} ===============`.red);
 }
 
 async function getAttendee(attendeeMessageID) {
@@ -163,14 +163,23 @@ async function getAttendee(attendeeMessageID) {
 
 async function detailedList(attendeeIndex) {
   // show list of attendees with details
+  const idList = [];
   const aList = await attendeeList(attendeeIndex);
   // readAttendeeRecord, decrypt, extract AttendeeID, timestamp
   for (let i = 0; i < aList.count; i++) {
     let attendeeToken = await getAttendee(aList.messageIds[i]);
     let aTokenJson = JSON.parse(attendeeToken);
-    console.log(
-      `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
-    );
+    if (idList.indexOf(aTokenJson.attendeeID) === -1) {
+      idList.push(aTokenJson.attendeeID);
+      console.log(
+        `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+      );
+    } else {
+      console.log(
+        `${i} : ${aList.messageIds[i]} - DOUBLE ID \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+          .brightRed
+      );
+    }
   }
 }
 
@@ -185,8 +194,10 @@ async function closeEvent(attendeeIndex) {
   for (let i = 0; i < aList.count; i++) {
     let attendeeToken = await getAttendee(aList.messageIds[i]);
     let aTokenJson = JSON.parse(attendeeToken);
-    // add to list
-    attList.push(aTokenJson.attendeeID);
+    // add to list if unique
+    if (attList.indexOf(aTokenJson.attendeeID) === -1) {
+      attList.push(aTokenJson.attendeeID);
+    }
   }
   // appendAttendeeList2MAM
   const payloadDataRec = {
