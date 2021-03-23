@@ -15,7 +15,6 @@ const {
   hexToBuffer,
   sha256,
   encrypt,
-  bufferToUtf8,
   utf8ToBuffer,
 } = require("eccrypto-js");
 const luxon = require("luxon");
@@ -54,16 +53,17 @@ function readQR() {
 
 async function readQRmam(qrSeed) {
   const mode = "restricted";
-  const sideKey = "DATE"; //TODO make it dynamic UTC-date
+  const sideKey = "DATE"; //TODO make it dynamic UTC-date?
   let rootValue = "NON";
   let indexationKey = "";
 
   let qrRoot = channelRoot(createChannel(qrSeed, 2, mode, sideKey));
-  console.log("Fetching from tangle, please wait...");
-  console.log(`Node : ${node}`.yellow);
-  console.log(`qrRoot : ${qrRoot}`.yellow);
-  console.log(`mode : ${mode}`.yellow);
-  console.log(`sideKey : ${sideKey}`.yellow);
+  //DEBUGINFO
+  // console.log("Fetching from tangle, please wait...");
+  // console.log(`Node : ${node}`.yellow);
+  // console.log(`qrRoot : ${qrRoot}`.yellow);
+  // console.log(`mode : ${mode}`.yellow);
+  // console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
   console.log("Fetching from tangle, please wait...");
@@ -89,12 +89,12 @@ async function readQRmam(qrSeed) {
 async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
-
-  console.log("Fetching from tangle with this information :");
-  console.log(`Node : ${node}`.yellow);
-  console.log(`EventRoot : ${publicEventRoot}`.yellow);
-  console.log(`mode : ${mode}`.yellow);
-  console.log(`sideKey : ${sideKey}`.yellow);
+  //DEBUGINFO
+  // console.log("Fetching from tangle with this information :");
+  // console.log(`Node : ${node}`.yellow);
+  // console.log(`EventRoot : ${publicEventRoot}`.yellow);
+  // console.log(`mode : ${mode}`.yellow);
+  // console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
   console.log("Fetching from tangle, please wait...");

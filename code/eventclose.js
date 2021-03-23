@@ -47,12 +47,12 @@ async function readPrivateOrganiserInfo() {
   const sideKey = privateSideKey;
 
   let root = channelRoot(createChannel(walletState.seed, 2, mode, sideKey));
-
-  console.log("Fetching from tangle with this information :");
-  console.log(`Node : ${node}`.yellow);
-  console.log(`EventRoot : ${root}`.yellow);
-  console.log(`mode : ${mode}`.yellow);
-  console.log(`sideKey : ${sideKey}`.yellow);
+  //DEBUGINFO
+  // console.log("Fetching from tangle with this information :");
+  // console.log(`Node : ${node}`.yellow);
+  // console.log(`EventRoot : ${root}`.yellow);
+  // console.log(`mode : ${mode}`.yellow);
+  // console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
   console.log(
@@ -80,10 +80,11 @@ async function readPublicEventInfo() {
   console.log(
     "Fetching publicEventInformation from tangle with this information :"
   );
-  console.log(`Node : ${node}`.yellow);
-  console.log(`EventRoot : ${publicEventRoot}`.yellow);
-  console.log(`mode : ${mode}`.yellow);
-  console.log(`sideKey : ${sideKey}`.yellow);
+  //DEBUGINFO
+  // console.log(`Node : ${node}`.yellow);
+  // console.log(`EventRoot : ${publicEventRoot}`.yellow);
+  // console.log(`mode : ${mode}`.yellow);
+  // console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
   console.log("Fetching from tangle, please wait...");
@@ -181,7 +182,7 @@ async function detailedList(attendeeIndex) {
       );
     }
   }
-  console.log(` Total unique IDs : ${idList.length()} =========`);
+  console.log(`Total unique IDs : ${idList.length} =========`.green);
 }
 
 async function closeEvent(attendeeIndex) {

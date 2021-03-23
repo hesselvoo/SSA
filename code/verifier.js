@@ -170,7 +170,7 @@ async function loadAttendeeTokens() {
 
 function checkAttended(ID, idList) {
   // check if attendeeID is on the list of registeredIDs
-  ID = ID + "a";
+  // ID = ID + "a";      // to test if not registered
   if (idList.indexOf(ID) === -1) {
     console.log(`ID : ${ID} was not registered at this event!`.brightRed);
     return false;
@@ -186,7 +186,7 @@ async function run() {
   console.log(`VerificationQR : ${verificationQR}`);
   qrOkay = await checkQR(verificationQR);
   if (!qrOkay) {
-    console.log("This QR-code is not correct! - Verification aborted.".red);
+    console.log("-- Verification aborted --".red);
     return;
   } else {
     // readEventInfo
