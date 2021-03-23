@@ -23,7 +23,7 @@ const keyPair = generateKeyPair();
 const privateOrgPrivateEventKey = keyPair.privateKey;
 const publicEventKey = keyPair.publicKey;
 
-// public organiserdetails
+// public organiserdetails -for demopurposes hardcoded
 const organiserName = "Courseware Ltd.";
 const organiserAddress = "53 Pumbertonstreet";
 const organiserPostcode = "23788";
@@ -33,7 +33,7 @@ const organiserTelephone = "01 234 56 789";
 const organiserMail = "info@courseware.com";
 const organiserDID = "did:example:123456789abcdefghi#key-1";
 
-// public eventdetails
+// public eventdetails -for demopurposes hardcoded
 const privateOrgPrivateTitle = "Interreg Blockchain-event midterm";
 const eventName = "Interreg Bling Midterm-conference";
 const eventDate = "March 9th 2021";
@@ -43,6 +43,7 @@ const eventLocation = "Online";
 let eventSEED = "";
 let organiserKey = "";
 let channelState;
+// demo-sidekey
 const commonSideKey =
   "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
 
@@ -51,7 +52,6 @@ let attendanceNotificationKey = "";
 
 const payload0 = {
   // Information for the private-organiser-Mam-record
-  //TODO make encryptable
 
   title: privateOrgPrivateTitle,
   timestamp: luxon.DateTime.now().toISO(),
@@ -103,7 +103,6 @@ function saveChannelState() {
 
 function saveQR(qrcode) {
   // save QRcode so we can use it in attendee.js
-
   console.log("Save QRcode >>>>>>>>".green);
   try {
     fs.writeFileSync("./QRcode.json", qrcode);
@@ -115,7 +114,6 @@ function saveQR(qrcode) {
 function saveSEEDnPassword() {
   // save eventSEED and eventPassword in (imaginery) organiserswallet
 
-  //eventWalletInfo = `{\n"seed":"${eventSEED}",\n"password":"${organiserKey}"\n}`;
   eventWalletInfo = `{
     "seed":"${eventSEED}",
     "password":"${organiserKey}",
@@ -218,7 +216,7 @@ async function makeQRmam(
   // timestamp - expiryDateTime
 
   const mode = "restricted";
-  const sideKey = "DATE"; //TODO change for dynamic UTC-date
+  const sideKey = "DATE"; //TODO change for dynamic UTC-date?
   let channelQRState;
 
   const payloadQR = {
@@ -257,6 +255,7 @@ async function makeQRmam(
   // Attach the message.
   console.log("Attaching =================".red);
   console.log("Attaching Eventmessage to tangle, please wait...");
+  // tag -SSA9EXPERIMENTQR- can be used lateron for storing on permanode
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENTQR");
   console.log(`Message Id`, messageId);
   console.log(
@@ -266,9 +265,7 @@ async function makeQRmam(
 }
 
 function makeMamEntryPointAttendee() {
-  //BUG let attendanceNotificationKey = "";
   const publicEventRoot = channelState.nextRoot;
-  // const expiryDateTime = new Date(); //TODO + 15min? variable to set by organiser
   const expiryDateTime = luxon.DateTime.now().plus({ minutes: 15 }); // to be set by organiser
 
   attendanceNotificationKey = generateSeed(64);

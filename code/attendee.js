@@ -146,11 +146,7 @@ async function hashHash(mroot) {
 }
 
 async function mamInteract(eventQR) {
-  const payload0 = {
-    attendeeID: merkleHash2,
-    remark: "Robert", //HINT optional, can remain empty. Will be striped by closeevent.
-    timestamp: new Date().toLocaleString(),
-  };
+  // start the whole process
 
   await readQRmam(eventQR);
   if (publicEventRoot === "NON") {
@@ -173,6 +169,12 @@ async function mamInteract(eventQR) {
   // console.log(eventPersonalMerkleRoot);
   // console.log(merkleHash2);
   // console.log("===========");
+
+  const payload0 = {
+    attendeeID: merkleHash2,
+    remark: "X1457", //HINT optional, can remain empty. Will be striped by closeevent.
+    timestamp: new Date().toLocaleString(),
+  };
 
   //DEBUGINFO
   // console.log("Payloadcontent ==============".green);
@@ -216,6 +218,8 @@ async function mamInteract(eventQR) {
   // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
   // Timestamp to check is it a recent QR
   // CRC = last 5 digits of sha256, to check if QR is manipulated
+  // convert to Uppercase so you can hardly see where hash ends
+  // and make it harder to calculate hash of a manipulated code
   const merkleHash = await hashHash(eventPersonalMerkleRoot);
   const nowEpoch = luxon.DateTime.now().toMillis();
   let verifierQR = bufferToHex(merkleHash) + publicEventRoot + nowEpoch;

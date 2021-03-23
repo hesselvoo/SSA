@@ -1,7 +1,7 @@
 # Node-SSA-app
 
 This is the Self Sovereign Attendancy application.
-Written for NodeJS as a PoC (with lots of remarks en debug-info in the source).
+Written for NodeJS as a PoC+ with securitymeasures builtin (and with LOTS of remarks en debuginfo in the source -over 70%-).
 
 The code-dir has a JS-file for 4 modules:
 

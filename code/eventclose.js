@@ -158,7 +158,7 @@ async function getAttendee(attendeeMessageID) {
   }
 }
 
-async function closeEvent(attendeeIndex) {
+async function detailedList(attendeeIndex) {
   // makelist, writeList2MAM, writeCloseMessage
   const aList = await attendeeList(attendeeIndex);
   // readAttendeeRecord, decrypt, extract AttendeeID, add2List
@@ -192,14 +192,20 @@ async function run() {
   console.log("=================================================".green);
   let theEnd = false;
   while (!theEnd) {
-    let menuChoice = prompt("Menu [l]-list, [c]-close, [q]-quit : ");
+    let menuChoice = prompt(
+      "Menu [l]-list, [d]-detailedlist, [c]-close, [q]-quit : "
+    );
     if (menuChoice == "l") {
       // show current list of attendees
       await showAlist(attendancyAddress);
     }
+    if (menuChoice == "d") {
+      // close the event
+      await detailedList(attendancyAddress);
+    }
     if (menuChoice == "c") {
       // close the event
-      await closeEvent(attendancyAddress);
+      await detailedList(attendancyAddress);
     }
     if (menuChoice == "q") {
       // close the application
