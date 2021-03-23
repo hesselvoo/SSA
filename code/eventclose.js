@@ -15,6 +15,7 @@ const {
   channelRoot,
 } = require("@iota/mam-chrysalis.js");
 const { retrieveData, SingleNodeClient, Converter } = require("@iota/iota.js");
+const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
@@ -23,6 +24,7 @@ let walletState;
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
   "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
+let mamNextRoot;
 let privateSideKey = "";
 let privateOrgPrivateEventKey = "";
 let attendancyAddress = "";
@@ -90,6 +92,7 @@ async function readPublicEventInfo() {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
     // console.log("Fetched : ", fMessage);
     eventInformation = fMessage;
+    mamNextRoot = fetched.nextRoot;
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
@@ -173,17 +176,91 @@ async function detailedList(attendeeIndex) {
 
 async function closeEvent(attendeeIndex) {
   // makelist, writeList2MAM, writeCloseMessage
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+
+  const attList = [];
   const aList = await attendeeList(attendeeIndex);
   // readAttendeeRecord, decrypt, extract AttendeeID, add2List
   for (let i = 0; i < aList.count; i++) {
     let attendeeToken = await getAttendee(aList.messageIds[i]);
     let aTokenJson = JSON.parse(attendeeToken);
-    // console.log(
-    //   `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
-    // );
+    // add to list
+    attList.push(aTokenJson.attendeeID);
   }
   // appendAttendeeList2MAM
+  const payloadDataRec = {
+    count: aList.count,
+    ids: attList,
+  };
+  console.log("AttendeeListRec ===============".red);
+  console.log(payloadDataRec);
+  // loadchannelState
+  try {
+    const currentState = fs.readFileSync("./channelState.json");
+    if (currentState) {
+      channelState = JSON.parse(currentState.toString());
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  const mamMessage = createMessage(
+    channelState,
+    TrytesHelper.fromAscii(JSON.stringify(payloadDataRec))
+  );
+
+  // Display the details for the MAM message.
+  console.log("=================".red);
+  console.log("Seed:", channelState.seed);
+  console.log("Address:", mamMessage.address);
+  console.log("Root:", mamMessage.root);
+  console.log("NextRoot:", channelState.nextRoot);
+
+  // Attach the message.
+  console.log("Attaching =================".red);
+  console.log("Attaching attendeeListMessage to tangle, please wait...");
+  const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
+  console.log(`Message Id`, messageId);
+  console.log(
+    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+  );
+  console.log("===============================".yellow);
   // appendCloseMessage -include closingTimestamp
+  let nu = luxon.DateTime.now();
+  const payloadClose = {
+    message: "Event closed",
+    date: nu.toISO(),
+  };
+
+  const mamCloseMessage = createMessage(
+    channelState,
+    TrytesHelper.fromAscii(JSON.stringify(payloadClose))
+  );
+
+  // Attach the message.
+  console.log("Attaching =================".red);
+  console.log("Attaching closingMessage to tangle, please wait...");
+  const { messageCloseId } = await mamAttach(
+    node,
+    mamCloseMessage,
+    "SSA9EXPERIMENT"
+  );
+  // Store the channel state for appending messages
+  try {
+    fs.writeFileSync(
+      "./channelState.json",
+      JSON.stringify(channelState, undefined, "\t")
+    );
+  } catch (e) {
+    console.error(e);
+  }
+  console.log(`Message Id`, messageCloseId);
+  console.log(
+    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamCloseMessage.root}/${mode}/${sideKey}`
+  );
+  console.log("===============================".yellow);
+
   // writeMAMstate for appending extra information
 }
 
@@ -201,6 +278,7 @@ async function run() {
   await readPublicEventInfo();
   // show EventInformation
   presentEventInfo(eventInformation);
+  //TODO show if event was already close
 
   console.log("=================================================".green);
   let theEnd = false;
@@ -218,10 +296,10 @@ async function run() {
     }
     if (menuChoice == "c") {
       // close the event
-      await detailedList(attendancyAddress);
+      await closeEvent(attendancyAddress);
     }
     if (menuChoice == "q") {
-      // close the application
+      // exit the application
       theEnd = true;
     }
   }
