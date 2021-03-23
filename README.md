@@ -3,6 +3,10 @@
 This is the Self Sovereign Attendancy application.
 Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (and with LOTS of remarks en debuginfo in the source -over 70%-).
 
+This code is part of Interreg Bling[^first]. The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/
+
+[^first]: https://northsearegion.eu/bling/
+
 The code-dir has a JS-file for 4 modules:
 
 - organiser.js
@@ -42,7 +46,3 @@ It is all based upon IOTA-MAMchannels on the chrysalis-testnet. To be replaced w
 > (this code is a startingpoint and can ALWAYS use some refactoring/cleanup -it's a PoC- so PR's are welcome)
 
 (c) Adri Wischmann 2021
-
-```
-
-```
