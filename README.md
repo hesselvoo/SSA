@@ -3,9 +3,7 @@
 This is the Self Sovereign Attendancy application.
 Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (and with LOTS of remarks en debuginfo in the source -over 70%-).
 
-This code is part of Interreg Bling[^first]. The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/
-
-[^first]: https://northsearegion.eu/bling/
+The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/ and an animationvideo about it can be found here : https://www.youtube.com/watch?v=VDKABf8hmFI
 
 The code-dir has a JS-file for 4 modules:
 
