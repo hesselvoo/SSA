@@ -246,6 +246,7 @@ async function closeEvent(attendeeIndex) {
     mamCloseMessage,
     "SSA9EXPERIMENT"
   );
+
   // Store the channel state for appending messages
   try {
     fs.writeFileSync(
@@ -260,7 +261,7 @@ async function closeEvent(attendeeIndex) {
     `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamCloseMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
-
+  console.log("-- Event closed by organiser --".cyan);
   // writeMAMstate for appending extra information
 }
 
@@ -278,7 +279,7 @@ async function run() {
   await readPublicEventInfo();
   // show EventInformation
   presentEventInfo(eventInformation);
-  //TODO show if event was already close
+  //TODO show if event was already closed
 
   console.log("=================================================".green);
   let theEnd = false;
