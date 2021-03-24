@@ -144,8 +144,7 @@ async function loadAttendeeTokens() {
     // console.log("ReadMAM ===========".red);
     const fetched = await mamFetch(node, nextMAMRoot, mode, sideKey);
     // console.log(`fetched : ${fetched.message}`.green);
-    let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    // console.dir(`Message : ${fMessage}`);
+
     if (fetched) {
       let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
       //   console.log(`fMessage : ${fMessage}`.cyan);
