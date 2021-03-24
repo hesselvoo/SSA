@@ -13,6 +13,7 @@ const {
   mamFetch,
   TrytesHelper,
   channelRoot,
+  mamFetchAll,
 } = require("@iota/mam-chrysalis.js");
 const { retrieveData, SingleNodeClient, Converter } = require("@iota/iota.js");
 const luxon = require("luxon");
@@ -279,6 +280,29 @@ async function closeEvent(attendeeIndex) {
   // writeMAMstate for appending extra information
 }
 
+async function mamClosed() {
+  // check if event was already closed or stil open
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+
+  console.log("Checking if event was closed..".yellow);
+  let mamOpenStatus = true;
+  const fetched = await mamFetchAll(node, publicEventRoot, mode, sideKey);
+  if (fetched && fetched.length > 0) {
+    for (let i = 0; i < fetched.length; i++) {
+      const element = fetched[i].message;
+      let fMessage = JSON.parse(TrytesHelper.toAscii(element));
+      if (fMessage.message == "Event closed") {
+        mamOpenStatus = false;
+        console.log(
+          `Eventregistration was closed at : ${fMessage.date}`.brightRed
+        );
+      }
+    }
+  }
+  return mamOpenStatus;
+}
+
 async function run() {
   console.log("Event-close-app".cyan);
   readWallet();
@@ -293,24 +317,30 @@ async function run() {
   await readPublicEventInfo();
   // show EventInformation
   presentEventInfo(eventInformation);
-  //TODO show if event was already closed
+  // check & show if event was already closed
+  let mamOpen = await mamClosed();
 
   console.log("=================================================".green);
   let theEnd = false;
   while (!theEnd) {
-    let menuChoice = prompt(
-      "Menu [l]-list, [d]-detailedlist, [c]-close, [q]-quit : "
-    );
-    if (menuChoice == "l") {
-      // show current list of attendees
+    let promptString = "Menu: [t]-Tanglelist, [d]-detailedTanglelist";
+    promptString += mamOpen ? ", [c]-close" : ",  [a]-attendeelist";
+    promptString += ", [q]-quit : ";
+    let menuChoice = prompt(promptString);
+    if (menuChoice == "t") {
+      // show current list of transactions on the Tangle
       await showAlist(attendancyAddress);
     }
     if (menuChoice == "d") {
-      // close the event
+      // show the details of the current transactions on the Tangle
+      await detailedList(attendancyAddress);
+    }
+    if (menuChoice == "a") {
+      // show the list of official attendeeTokens
       await detailedList(attendancyAddress);
     }
     if (menuChoice == "c") {
-      // close the event
+      // close the event and write the official attendeelist
       await closeEvent(attendancyAddress);
     }
     if (menuChoice == "q") {

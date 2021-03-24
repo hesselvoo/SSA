@@ -155,18 +155,16 @@ async function mamInteract(eventQR) {
   // start the whole process
 
   await readQRmam(eventQR);
-  console.log("NA readQRmam==================");
   if (publicEventRoot === "NON") {
     console.log("Invalid eventRoot-address".brightred);
     return;
   }
   let nowDate = luxon.DateTime.now();
   let expFromISO = luxon.DateTime.fromISO(expdatetime);
-  console.log(nowDate.toISO());
-  console.log(expFromISO.toISO());
+  // console.log(nowDate.toISO());
+  // console.log(expFromISO.toISO());
   if (nowDate.toMillis() > expFromISO.toMillis()) {
-    // if (true) {
-    // check for expiry of registration - set by organiser: 15 min?
+    // check for expiry of registration - set by organiser: 20? min
     console.log("The registration to this event has expired.".brightRed);
     return;
   }
