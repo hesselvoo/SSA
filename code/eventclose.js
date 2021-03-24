@@ -203,11 +203,12 @@ async function closeEvent(attendeeIndex) {
   }
   // appendAttendeeList2MAM
   const payloadDataRec = {
-    count: aList.count,
+    count: attList.length,
     ids: attList,
   };
-  console.log("AttendeeListRec ===============".red);
-  console.log(payloadDataRec);
+  // console.log("AttendeeListRec ===============".red);
+  // console.log(payloadDataRec);
+
   // loadchannelState
   try {
     const currentState = fs.readFileSync("./channelState.json");

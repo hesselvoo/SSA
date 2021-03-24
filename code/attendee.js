@@ -21,6 +21,7 @@ const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
+const { resolve } = require("path");
 // const { Console } = require("console");
 
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
@@ -29,6 +30,7 @@ const commonSideKey =
 
 let publicEventRoot = "";
 let attendancyAddress = "";
+let expdatetime = "";
 let eventInformation = "";
 
 // Personal information to calculate the Merkle-root
@@ -40,7 +42,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d7";
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d8";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -70,27 +72,31 @@ async function readQRmam(qrSeed) {
   const fetched = await mamFetch(node, qrRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    console.log("Fetched : ", fMessage);
+    // console.log("Fetched : ", fMessage);
     rootValue = fMessage.root;
     indexationKey = fMessage.indexation;
+    expdatetime = fMessage.expirytimestamp;
     console.log(`Message.root : ${rootValue}`);
     console.log(`Message.indexation : ${indexationKey}`);
+    console.log(`Expirydatetime : ${expdatetime}`);
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
+  publicEventRoot = rootValue;
+  attendancyAddress = indexationKey;
   //DEBUGINFO
   // console.log("MAMdata ===================".red);
   // console.log(`fetched : ${fetched.message}`.green);
-  console.log("============================".yellow);
-  publicEventRoot = rootValue;
-  attendancyAddress = indexationKey;
+  // console.log("============================".yellow);
+  // console.log(publicEventRoot);
+  // console.log(attendancyAddress);
 }
 
 async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
   //DEBUGINFO
-  // console.log("Fetching from tangle with this information :");
+  // console.log("Fetching from publicEventtangle with this information :");
   // console.log(`Node : ${node}`.yellow);
   // console.log(`EventRoot : ${publicEventRoot}`.yellow);
   // console.log(`mode : ${mode}`.yellow);
@@ -149,9 +155,19 @@ async function mamInteract(eventQR) {
   // start the whole process
 
   await readQRmam(eventQR);
+  console.log("NA readQRmam==================");
   if (publicEventRoot === "NON") {
-    //TODO also check for expiry
-    console.log("Invalid eventRoot-address".red);
+    console.log("Invalid eventRoot-address".brightred);
+    return;
+  }
+  let nowDate = luxon.DateTime.now();
+  let expFromISO = luxon.DateTime.fromISO(expdatetime);
+  console.log(nowDate.toISO());
+  console.log(expFromISO.toISO());
+  if (nowDate.toMillis() > expFromISO.toMillis()) {
+    // if (true) {
+    // check for expiry of registration - set by organiser: 15 min?
+    console.log("The registration to this event has expired.".brightRed);
     return;
   }
   await readPublicEventInfo(publicEventRoot);
@@ -172,7 +188,7 @@ async function mamInteract(eventQR) {
 
   const payload0 = {
     attendeeID: merkleHash2,
-    remark: "Student 1", //HINT optional, can remain empty. Will be striped by closeevent.
+    remark: "Rob", //HINT optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 
@@ -235,7 +251,5 @@ let readQRcode = readQR();
 console.log(`QRcode from file = ${readQRcode}`.yellow);
 let eventQR = prompt("Event QR-code (*=savedversion): ");
 if (eventQR === "*") eventQR = readQRcode;
-
-//TODO choose from 3 personas for demopurposes
 
 mamInteract(eventQR);

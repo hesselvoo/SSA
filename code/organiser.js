@@ -266,7 +266,8 @@ async function makeQRmam(
 
 function makeMamEntryPointAttendee() {
   const publicEventRoot = channelState.nextRoot;
-  const expiryDateTime = luxon.DateTime.now().plus({ minutes: 15 }); // to be set by organiser
+  //HINT make expirydelay a variable
+  const expiryDateTime = luxon.DateTime.now().plus({ minutes: 20 }); // to be set by organiser
 
   attendanceNotificationKey = generateSeed(64);
   console.log(`nextroot : ${channelState.nextRoot}`.red);
