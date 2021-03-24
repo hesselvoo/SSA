@@ -124,7 +124,7 @@ function presentEventInfo(eventRecord) {
 async function attendeeList(attIndexation) {
   // retrieve a raw list of attendeetransactions
   const client = new SingleNodeClient(node);
-  console.log(`attendeeList : ${attIndexation}`.green);
+  // console.log(`attendeeList : ${attIndexation}`.green);
   const found = await client.messagesFind(attIndexation);
   return found;
 }
@@ -138,7 +138,7 @@ async function showAlist(attendeeIndex) {
     console.log(`${i + 1} : ${mList.messageIds[i]}`);
   }
   // showAttendeeCount
-  console.log(`Total : ${mList.count} ===============`.red);
+  console.log(`Total : ${mList.count} ===============`.green);
 }
 
 async function getAttendee(attendeeMessageID) {
@@ -321,14 +321,15 @@ async function officialAttendeeList() {
 
   // Try fetching from MAM
   let readMAM = true;
+  let aListRoot = nextMAMRoot;
   while (readMAM) {
     // readMAMrecord
     // console.log("ReadMAM ===========".red);
-    const fetched = await mamFetch(node, nextMAMRoot, mode, sideKey);
+    const fetched = await mamFetch(node, aListRoot, mode, sideKey);
     // console.log(`fetched : ${fetched.message}`.green);
     if (fetched) {
       let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-      nextMAMRoot = fetched.nextRoot;
+      aListRoot = fetched.nextRoot;
       //DEBUGINFO
       //   console.log("MAMdata ===================".red);
       //   console.log(`fetched : ${fMessage.count}`.green);
@@ -344,20 +345,21 @@ async function officialAttendeeList() {
       }
     }
   }
-  for (const aID of aList) {
-    console.log(`AttendeeToken : ${aID}`);
+  for (const x in aList) {
+    console.log(`AttendeeToken ${1 + parseInt(x)} : ${aList[x]}`);
   }
-  console.log(`Total attendees : ${aList.length}`);
+  console.log(`Total attendees : ${aList.length}`.green);
 }
 
 async function run() {
   console.log("Event-close-app".cyan);
   readWallet();
-  console.log("Wallet".red);
-  console.log(`EventSEED  : ${walletState.seed}`);
-  console.log(`Password   : ${walletState.password}`);
-  console.log(`Indexation : ${walletState.indexation}`);
-  console.log(`AttendeeQR : ${walletState.aQR}`);
+  //DEBUGINFO
+  // console.log("Wallet".red);
+  // console.log(`EventSEED  : ${walletState.seed}`);
+  // console.log(`Password   : ${walletState.password}`);
+  // console.log(`Indexation : ${walletState.indexation}`);
+  // console.log(`AttendeeQR : ${walletState.aQR}`);
 
   // extractPrivateEventKey
   await readPrivateOrganiserInfo();
@@ -373,7 +375,7 @@ async function run() {
     let promptString = "Menu: [t]-Tanglelist, [d]-detailedTanglelist";
     promptString += mamOpen ? ", [c]-close" : ",  [a]-attendeelist";
     promptString += ", [q]-quit : ";
-    let menuChoice = prompt(promptString);
+    let menuChoice = prompt(promptString.yellow);
     if (menuChoice == "t") {
       // show current list of transactions on the Tangle
       await showAlist(attendancyAddress);
