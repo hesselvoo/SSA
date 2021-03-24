@@ -188,11 +188,11 @@ async function addEvent2Mam(payload) {
   // console.log(mamMessage);
 
   // Display the details for the MAM message.
-  console.log("=================".red);
-  console.log("Seed:", channelState.seed);
-  console.log("Address:", mamMessage.address);
-  console.log("Root:", mamMessage.root);
-  console.log("NextRoot:", channelState.nextRoot);
+  // console.log("=================".red);
+  // console.log("Seed:", channelState.seed);
+  // console.log("Address:", mamMessage.address);
+  // console.log("Root:", mamMessage.root);
+  // console.log("NextRoot:", channelState.nextRoot);
 
   // Attach the message.
   console.log("Attaching =================".red);

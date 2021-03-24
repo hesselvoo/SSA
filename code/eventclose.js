@@ -8,7 +8,6 @@ const eccryptoJS = require("eccrypto-js");
 const {
   createChannel,
   createMessage,
-  parseMessage,
   mamAttach,
   mamFetch,
   TrytesHelper,
@@ -25,11 +24,12 @@ let walletState;
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
   "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
-let mamNextRoot;
 let privateSideKey = "";
 let privateOrgPrivateEventKey = "";
 let attendancyAddress = "";
+let nextMAMRoot = "";
 let eventInformation = "";
+let mamOpen = true;
 
 async function readWallet() {
   // Try and load the wallet state from json file
@@ -78,23 +78,22 @@ async function readPublicEventInfo() {
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  console.log(
-    "Fetching publicEventInformation from tangle with this information :"
-  );
   //DEBUGINFO
+  // console.log(
+  //   "Fetching publicEventInformation from tangle with this information :"
+  // );
   // console.log(`Node : ${node}`.yellow);
   // console.log(`EventRoot : ${publicEventRoot}`.yellow);
   // console.log(`mode : ${mode}`.yellow);
   // console.log(`sideKey : ${sideKey}`.yellow);
 
   // Try fetching from MAM
-  console.log("Fetching from tangle, please wait...");
+  console.log("Fetching publicEventInfo from tangle, please wait...");
   const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    // console.log("Fetched : ", fMessage);
     eventInformation = fMessage;
-    mamNextRoot = fetched.nextRoot;
+    nextMAMRoot = fetched.nextRoot;
   } else {
     console.log("Nothing was fetched from the MAM channel");
   }
@@ -124,7 +123,7 @@ function presentEventInfo(eventRecord) {
 async function attendeeList(attIndexation) {
   // retrieve a raw list of attendeetransactions
   const client = new SingleNodeClient(node);
-  console.log(`attendeeList : ${attIndexation}`.green);
+  // console.log(`attendeeList : ${attIndexation}`.green);
   const found = await client.messagesFind(attIndexation);
   return found;
 }
@@ -135,10 +134,10 @@ async function showAlist(attendeeIndex) {
   console.log("===============".red);
   const mList = await attendeeList(attendeeIndex);
   for (let i = 0; i < mList.count; i++) {
-    console.log(`${i} : ${mList.messageIds[i]}`);
+    console.log(`${i + 1} : ${mList.messageIds[i]}`);
   }
   // showAttendeeCount
-  console.log(`Total : ${mList.count} ===============`.red);
+  console.log(`Total : ${mList.count} ===============`.green);
 }
 
 async function getAttendee(attendeeMessageID) {
@@ -174,12 +173,15 @@ async function detailedList(attendeeIndex) {
     if (idList.indexOf(aTokenJson.attendeeID) === -1) {
       idList.push(aTokenJson.attendeeID);
       console.log(
-        `${i} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
+        `${i + 1} : ${aList.messageIds[i]} \n\t ${aTokenJson.attendeeID} - ${
+          aTokenJson.remark
+        } - ${aTokenJson.timestamp}`
       );
     } else {
       console.log(
-        `${i} : ${aList.messageIds[i]} - DOUBLE ID - \n\t ${aTokenJson.attendeeID} - ${aTokenJson.remark} - ${aTokenJson.timestamp}`
-          .brightRed
+        `${i + 1} : ${aList.messageIds[i]} - DOUBLE ID - \n\t ${
+          aTokenJson.attendeeID
+        } - ${aTokenJson.remark} - ${aTokenJson.timestamp}`.brightRed
       );
     }
   }
@@ -210,7 +212,7 @@ async function closeEvent(attendeeIndex) {
   // console.log("AttendeeListRec ===============".red);
   // console.log(payloadDataRec);
 
-  // loadchannelState
+  // loadchannelState from imaginary organiserWallet
   try {
     const currentState = fs.readFileSync("./channelState.json");
     if (currentState) {
@@ -224,13 +226,13 @@ async function closeEvent(attendeeIndex) {
     channelState,
     TrytesHelper.fromAscii(JSON.stringify(payloadDataRec))
   );
-
+  //DEBUGINFO
   // Display the details for the MAM message.
-  console.log("=================".red);
-  console.log("Seed:", channelState.seed);
-  console.log("Address:", mamMessage.address);
-  console.log("Root:", mamMessage.root);
-  console.log("NextRoot:", channelState.nextRoot);
+  // console.log("=================".red);
+  // console.log("Seed:", channelState.seed);
+  // console.log("Address:", mamMessage.address);
+  // console.log("Root:", mamMessage.root);
+  // console.log("NextRoot:", channelState.nextRoot);
 
   // Attach the message.
   console.log("Attaching =================".red);
@@ -253,7 +255,7 @@ async function closeEvent(attendeeIndex) {
     TrytesHelper.fromAscii(JSON.stringify(payloadClose))
   );
 
-  // Attach the message.
+  // Attach the closing message.
   console.log("Attaching =================".red);
   console.log("Attaching closingMessage to tangle, please wait...");
   const { messageCloseId } = await mamAttach(
@@ -262,7 +264,7 @@ async function closeEvent(attendeeIndex) {
     "SSA9EXPERIMENT"
   );
 
-  // Store the channel state for appending messages
+  // writeMAMstate for appending extra information
   try {
     fs.writeFileSync(
       "./channelState.json",
@@ -277,10 +279,10 @@ async function closeEvent(attendeeIndex) {
   );
   console.log("===============================".yellow);
   console.log("-- Event closed by organiser --".cyan);
-  // writeMAMstate for appending extra information
+  mamOpen = false;
 }
 
-async function mamClosed() {
+async function mamClosedStatus() {
   // check if event was already closed or stil open
   const mode = "restricted";
   const sideKey = commonSideKey;
@@ -303,14 +305,60 @@ async function mamClosed() {
   return mamOpenStatus;
 }
 
+async function officialAttendeeList() {
+  //show list with attendeeTokens
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+  console.log(`Getattendees ===========`.red);
+  let aList = [];
+  //DEBUGINFO
+  // console.log("Fetching attendeeIDs from tangle with this information :");
+  // console.log(`Node : ${node}`.yellow);
+  // console.log(`EventRoot : ${nextMAMRoot}`.yellow);
+  // console.log(`mode : ${mode}`.yellow);
+  // console.log(`sideKey : ${sideKey}`.yellow);
+
+  // Try fetching from MAM
+  let readMAM = true;
+  let aListRoot = nextMAMRoot;
+  while (readMAM) {
+    // readMAMrecord
+    // console.log("ReadMAM ===========".red);
+    const fetched = await mamFetch(node, aListRoot, mode, sideKey);
+    // console.log(`fetched : ${fetched.message}`.green);
+    if (fetched) {
+      let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
+      aListRoot = fetched.nextRoot;
+      //DEBUGINFO
+      //   console.log("MAMdata ===================".red);
+      //   console.log(`fetched : ${fMessage.count}`.green);
+      if (fMessage.message == "Event closed") {
+        console.log(
+          `Eventregistration closed at : ${fMessage.date} =====`.cyan
+        );
+        readMAM = false;
+      } else {
+        aList = aList.concat(fMessage.ids);
+        // console.log("attendeeList ========");
+        // console.log(`aList : ${aList}`.yellow);
+      }
+    }
+  }
+  for (const x in aList) {
+    console.log(`AttendeeToken ${1 + parseInt(x)} : ${aList[x]}`);
+  }
+  console.log(`Total attendees : ${aList.length}`.green);
+}
+
 async function run() {
   console.log("Event-close-app".cyan);
   readWallet();
-  console.log("Wallet".red);
-  console.log(`EventSEED  : ${walletState.seed}`);
-  console.log(`Password   : ${walletState.password}`);
-  console.log(`Indexation : ${walletState.indexation}`);
-  console.log(`AttendeeQR : ${walletState.aQR}`);
+  //DEBUGINFO
+  // console.log("Wallet".red);
+  // console.log(`EventSEED  : ${walletState.seed}`);
+  // console.log(`Password   : ${walletState.password}`);
+  // console.log(`Indexation : ${walletState.indexation}`);
+  // console.log(`AttendeeQR : ${walletState.aQR}`);
 
   // extractPrivateEventKey
   await readPrivateOrganiserInfo();
@@ -318,7 +366,7 @@ async function run() {
   // show EventInformation
   presentEventInfo(eventInformation);
   // check & show if event was already closed
-  let mamOpen = await mamClosed();
+  mamOpen = await mamClosedStatus();
 
   console.log("=================================================".green);
   let theEnd = false;
@@ -326,7 +374,7 @@ async function run() {
     let promptString = "Menu: [t]-Tanglelist, [d]-detailedTanglelist";
     promptString += mamOpen ? ", [c]-close" : ",  [a]-attendeelist";
     promptString += ", [q]-quit : ";
-    let menuChoice = prompt(promptString);
+    let menuChoice = prompt(promptString.yellow);
     if (menuChoice == "t") {
       // show current list of transactions on the Tangle
       await showAlist(attendancyAddress);
@@ -337,7 +385,7 @@ async function run() {
     }
     if (menuChoice == "a") {
       // show the list of official attendeeTokens
-      await detailedList(attendancyAddress);
+      await officialAttendeeList();
     }
     if (menuChoice == "c") {
       // close the event and write the official attendeelist
