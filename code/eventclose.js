@@ -279,7 +279,7 @@ async function closeEvent(attendeeIndex) {
   );
   console.log("===============================".yellow);
   console.log("-- Event closed by organiser --".cyan);
-  mamOpen = flase;
+  mamOpen = false;
 }
 
 async function mamClosedStatus() {

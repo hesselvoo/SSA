@@ -42,7 +42,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d4";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -186,7 +186,7 @@ async function mamInteract(eventQR) {
 
   const payload0 = {
     attendeeID: merkleHash2,
-    remark: "Rob", //HINT optional, can remain empty. Will be striped by closeevent.
+    remark: "Student1", //HINT optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 
