@@ -8,7 +8,6 @@ const eccryptoJS = require("eccrypto-js");
 const {
   createChannel,
   createMessage,
-  parseMessage,
   mamAttach,
   mamFetch,
   TrytesHelper,
@@ -227,7 +226,7 @@ async function closeEvent(attendeeIndex) {
     channelState,
     TrytesHelper.fromAscii(JSON.stringify(payloadDataRec))
   );
-
+  //DEBUGINFO
   // Display the details for the MAM message.
   // console.log("=================".red);
   // console.log("Seed:", channelState.seed);

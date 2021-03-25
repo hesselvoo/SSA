@@ -3,14 +3,9 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const {
-  mamFetch,
-  TrytesHelper,
-  mamFetchAll,
-} = require("@iota/mam-chrysalis.js");
+const { mamFetch, TrytesHelper } = require("@iota/mam-chrysalis.js");
 const { Converter } = require("@iota/iota.js");
 const { sha256, utf8ToBuffer, bufferToHex } = require("eccrypto-js");
-// const crypto = require("crypto");
 const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
