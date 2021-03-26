@@ -42,7 +42,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d4";
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d0";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -76,8 +76,8 @@ async function readQRmam(qrSeed) {
     rootValue = fMessage.root;
     indexationKey = fMessage.indexation;
     expdatetime = fMessage.expirytimestamp;
-    console.log(`Message.root : ${rootValue}`);
-    console.log(`Message.indexation : ${indexationKey}`);
+    // console.log(`Message.root : ${rootValue}`);
+    // console.log(`Message.indexation : ${indexationKey}`);
     console.log(`Expirydatetime : ${expdatetime}`);
   } else {
     console.log("Nothing was fetched from the MAM channel");
@@ -133,6 +133,7 @@ function presentEventInfo(eventRecord) {
   console.log(`E-mail : ${eventRecord.orgmail}`);
   console.log(`WWW : ${eventRecord.orgurl}`);
   console.log(`DID : ${eventRecord.orgdid}`);
+  console.log("=================================".red);
 }
 
 function saveVerifierQR(verifierdata) {
@@ -163,13 +164,20 @@ async function mamInteract(eventQR) {
   let expFromISO = luxon.DateTime.fromISO(expdatetime);
   // console.log(nowDate.toISO());
   // console.log(expFromISO.toISO());
-  if (nowDate.toMillis() > expFromISO.toMillis()) {
+  // if (nowDate.toMillis() > expFromISO.toMillis()) {
+  if (nowDate > expFromISO) {
     // check for expiry of registration - set by organiser: 20? min
     console.log("The registration to this event has expired.".brightRed);
     return;
   }
   await readPublicEventInfo(publicEventRoot);
   presentEventInfo(eventInformation);
+  const answer = prompt(
+    "Would you like to register for this event? [Y,n]: ".yellow
+  );
+  if (answer == "n") {
+    return;
+  }
 
   //TODO hashPersonalInfo
   // setup&calculate merkle-root
@@ -186,7 +194,7 @@ async function mamInteract(eventQR) {
 
   const payload0 = {
     attendeeID: merkleHash2,
-    remark: "Student1", //HINT optional, can remain empty. Will be striped by closeevent.
+    remark: "QWERT", //HINT optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 

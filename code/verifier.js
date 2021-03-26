@@ -3,7 +3,11 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const { mamFetch, TrytesHelper } = require("@iota/mam-chrysalis.js");
+const {
+  mamFetch,
+  mamFetchAll,
+  TrytesHelper,
+} = require("@iota/mam-chrysalis.js");
 const { Converter } = require("@iota/iota.js");
 const { sha256, utf8ToBuffer, bufferToHex } = require("eccrypto-js");
 const luxon = require("luxon");
@@ -75,6 +79,34 @@ async function checkQR(code) {
   return false;
 }
 
+// This could be done much more efficient by only running mamFetchAll once
+// to provide the information for all routines..
+// for demo-purposes we made seperate functions (and doing double/triple work)
+
+async function mamStillOpenStatus() {
+  // check if event was already closed or stil open
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+
+  console.log("Checking if event was closed....".yellow);
+  let mamOpenStatus = true;
+  const fetched = await mamFetchAll(node, publicEventRoot, mode, sideKey);
+  if (fetched && fetched.length > 0) {
+    for (let i = 0; i < fetched.length; i++) {
+      const element = fetched[i].message;
+      let fMessage = JSON.parse(TrytesHelper.toAscii(element));
+      // console.log(i, fMessage);
+      if (fMessage.message == "Event closed") {
+        mamOpenStatus = false;
+        // console.log(
+        //   `Eventregistration was closed attt : ${fMessage.date}`.brightRed
+        // );
+      }
+    }
+  }
+  return mamOpenStatus;
+}
+
 async function readPublicEventInfo(publicEventRoot) {
   const mode = "restricted";
   const sideKey = commonSideKey;
@@ -103,12 +135,13 @@ async function readPublicEventInfo(publicEventRoot) {
 }
 
 function presentEventInfo(eventRecord) {
-  console.log("=================================".red);
+  console.log("Eventinformation =================================".red);
   console.log("Event :".cyan);
   console.log(`Name : ${eventRecord.eventname}`);
   console.log(`Date : ${eventRecord.eventdate}`);
   console.log(`Time : ${eventRecord.eventtime}`);
   console.log(`Location : ${eventRecord.eventloc}`);
+  console.log("=================================".red);
   console.log("Organised by :".cyan);
   console.log(`Organisation : ${eventRecord.orgname}`);
   console.log(`Address : ${eventRecord.orgaddress}`);
@@ -118,6 +151,7 @@ function presentEventInfo(eventRecord) {
   console.log(`E-mail : ${eventRecord.orgmail}`);
   console.log(`WWW : ${eventRecord.orgurl}`);
   console.log(`DID : ${eventRecord.orgdid}`);
+  console.log("=================================".red);
 }
 
 async function loadAttendeeTokens() {
@@ -189,6 +223,13 @@ async function run() {
     if (eventInformation.eventPublicKey.length > 0) {
       // show eventinfo
       presentEventInfo(eventInformation);
+      if (await mamStillOpenStatus()) {
+        console.log(
+          `Eventregistration is open at this moment, no check possible.`
+            .brightRed
+        );
+        return;
+      }
       const attendeeList = await loadAttendeeTokens();
       // checkAttendeeOnList
       checkAttended(attendeeToken, attendeeList);
