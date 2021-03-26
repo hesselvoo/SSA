@@ -118,6 +118,7 @@ function presentEventInfo(eventRecord) {
   console.log(`E-mail : ${eventRecord.orgmail}`);
   console.log(`WWW : ${eventRecord.orgurl}`);
   console.log(`DID : ${eventRecord.orgdid}`);
+  console.log("=================================".red);
 }
 
 async function attendeeList(attIndexation) {
@@ -188,6 +189,47 @@ async function detailedList(attendeeIndex) {
   console.log(`Total unique IDs : ${idList.length} =========`.green);
 }
 
+async function writeCloseMessage(mamChannelState) {
+  // appendCloseMessage -include closingTimestamp
+  const mode = "restricted";
+  const sideKey = commonSideKey;
+
+  let nu = luxon.DateTime.now();
+
+  const payloadClose = {
+    message: "Event closed",
+    date: nu.toISO(),
+  };
+
+  const mamCloseMessage = createMessage(
+    mamChannelState,
+    TrytesHelper.fromAscii(JSON.stringify(payloadClose))
+  );
+
+  // writeMAMstate for appending extra information
+  try {
+    fs.writeFileSync(
+      "./channelState.json",
+      JSON.stringify(mamChannelState, undefined, "\t")
+    );
+  } catch (e) {
+    console.error(e);
+  }
+
+  // Attach the closing message.
+  console.log("Attaching =================".red);
+  console.log("Attaching closingMessage to tangle, please wait...");
+  const { messageId } = await mamAttach(
+    node,
+    mamCloseMessage,
+    "SSA9EXPERIMENT"
+  );
+  console.log(`Message Id`, messageId);
+  console.log(
+    `You can view the mam channel here \n https://explorer.iota.org/chrysalis/streams/0/${mamCloseMessage.root}/${mode}/${sideKey}`
+  );
+}
+
 async function closeEvent(attendeeIndex) {
   // makelist, writeList2MAM, writeCloseMessage
   const mode = "restricted";
@@ -243,40 +285,7 @@ async function closeEvent(attendeeIndex) {
     `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
-  // appendCloseMessage -include closingTimestamp
-  let nu = luxon.DateTime.now();
-  const payloadClose = {
-    message: "Event closed",
-    date: nu.toISO(),
-  };
-
-  const mamCloseMessage = createMessage(
-    channelState,
-    TrytesHelper.fromAscii(JSON.stringify(payloadClose))
-  );
-
-  // Attach the closing message.
-  console.log("Attaching =================".red);
-  console.log("Attaching closingMessage to tangle, please wait...");
-  const { messageCloseId } = await mamAttach(
-    node,
-    mamCloseMessage,
-    "SSA9EXPERIMENT"
-  );
-
-  // writeMAMstate for appending extra information
-  try {
-    fs.writeFileSync(
-      "./channelState.json",
-      JSON.stringify(channelState, undefined, "\t")
-    );
-  } catch (e) {
-    console.error(e);
-  }
-  console.log(`Message Id`, messageCloseId);
-  console.log(
-    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamCloseMessage.root}/${mode}/${sideKey}`
-  );
+  await writeCloseMessage(channelState);
   console.log("===============================".yellow);
   console.log("-- Event closed by organiser --".cyan);
   mamOpen = false;
@@ -299,6 +308,8 @@ async function mamClosedStatus() {
         console.log(
           `Eventregistration was closed at : ${fMessage.date}`.brightRed
         );
+      } else {
+        console.log(`Eventregistration is still open`.brightGreen);
       }
     }
   }

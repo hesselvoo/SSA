@@ -151,10 +151,10 @@ async function setupMam(payload) {
   console.log("=================".red);
 
   // Display the details for the MAM message.
-  console.log("Seed:", channelState.seed);
-  console.log("Address:", mamMessage.address);
-  console.log("Root:", mamMessage.root);
-  console.log("NextRoot:", channelState.nextRoot);
+  // console.log("Seed:", channelState.seed);
+  // console.log("Address:", mamMessage.address);
+  // console.log("Root:", mamMessage.root);
+  // console.log("NextRoot:", channelState.nextRoot);
 
   // Attach the message.
   console.log("Attaching =================".red);
@@ -162,7 +162,7 @@ async function setupMam(payload) {
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
   console.log(`Message Id`, messageId);
   console.log(
-    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+    `You can view the mam channel here : \nhttps://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
 }
@@ -200,7 +200,7 @@ async function addEvent2Mam(payload) {
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
   console.log(`Message Id`, messageId);
   console.log(
-    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+    `You can view the mam channel here : \nhttps://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
 }
@@ -246,11 +246,11 @@ async function makeQRmam(
   // console.log(channelQRState);
 
   // Display the details for the MAM message.
-  console.log("=================".red);
-  console.log("Seed:", channelQRState.seed);
-  console.log("Address:", mamMessage.address);
-  console.log("Root:", mamMessage.root);
-  console.log("NextRoot:", channelQRState.nextRoot);
+  // console.log("=================".red);
+  // console.log("Seed:", channelQRState.seed);
+  // console.log("Address:", mamMessage.address);
+  // console.log("Root:", mamMessage.root);
+  // console.log("NextRoot:", channelQRState.nextRoot);
 
   // Attach the message.
   console.log("Attaching =================".red);
@@ -259,7 +259,7 @@ async function makeQRmam(
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENTQR");
   console.log(`Message Id`, messageId);
   console.log(
-    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+    `You can view the mam channel here : \nhttps://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
 }
@@ -267,10 +267,9 @@ async function makeQRmam(
 function makeMamEntryPointAttendee() {
   const publicEventRoot = channelState.nextRoot;
   //HINT make expirydelay a variable
-  const expiryDateTime = luxon.DateTime.now().plus({ minutes: 20 }); // to be set by organiser
+  const expiryDateTime = luxon.DateTime.now().plus({ minutes: 15 }); // to be set by organiser
 
   attendanceNotificationKey = generateSeed(64);
-  console.log(`nextroot : ${channelState.nextRoot}`.red);
   makeQRmam(
     channelState.nextRoot,
     attendanceNotificationKey,
