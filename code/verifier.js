@@ -3,11 +3,7 @@
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
 
-const {
-  mamFetch,
-  mamFetchAll,
-  TrytesHelper,
-} = require("@iota/mam-chrysalis.js");
+const { mamFetchAll, TrytesHelper } = require("@iota/mam-chrysalis.js");
 const { Converter } = require("@iota/iota.js");
 const { sha256, utf8ToBuffer, bufferToHex } = require("eccrypto-js");
 const luxon = require("luxon");
@@ -23,12 +19,18 @@ let verificationQR = "";
 let attendeeToken = "";
 let qrTime = "";
 let eventInformation = "";
-let nextMAMRoot = "";
+let mamClosedTime = "";
 
 async function hashHash(hashData) {
   let element = utf8ToBuffer(hashData);
   element = await sha256(element);
   return bufferToHex(element);
+}
+
+function getEventInfo(mamData) {
+  // convert from MAM to JSON
+  let fMessage = JSON.parse(TrytesHelper.toAscii(mamData.message));
+  return fMessage;
 }
 
 // readAttendeeQR
@@ -79,59 +81,28 @@ async function checkQR(code) {
   return false;
 }
 
-// This could be done much more efficient by only running mamFetchAll once
-// to provide the information for all routines..
-// for demo-purposes we made seperate functions (and doing double/triple work)
-
-async function mamStillOpenStatus() {
-  // check if event was already closed or stil open
+async function readWholeMam(startingRoot) {
+  // read ALL Mamrecords into memory
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  console.log("Checking if event was closed....".yellow);
+  console.log("Fetching eventinformation....".yellow);
+  const fetched = await mamFetchAll(node, startingRoot, mode, sideKey);
+  return fetched;
+}
+
+function mamStillOpenStatus(allMamData) {
+  // check if event was already closed or stil open
   let mamOpenStatus = true;
-  const fetched = await mamFetchAll(node, publicEventRoot, mode, sideKey);
-  if (fetched && fetched.length > 0) {
-    for (let i = 0; i < fetched.length; i++) {
-      const element = fetched[i].message;
-      let fMessage = JSON.parse(TrytesHelper.toAscii(element));
-      // console.log(i, fMessage);
-      if (fMessage.message == "Event closed") {
-        mamOpenStatus = false;
-        // console.log(
-        //   `Eventregistration was closed attt : ${fMessage.date}`.brightRed
-        // );
-      }
+  for (let i = 0; i < allMamData.length; i++) {
+    const element = allMamData[i].message;
+    let mamRecord = JSON.parse(TrytesHelper.toAscii(element));
+    if (mamRecord.message == "Event closed") {
+      mamOpenStatus = false;
+      mamClosedTime = mamRecord.date;
     }
   }
   return mamOpenStatus;
-}
-
-async function readPublicEventInfo(publicEventRoot) {
-  const mode = "restricted";
-  const sideKey = commonSideKey;
-  //DEBUGINFO
-  //   console.log("Fetching from tangle with this information :");
-  //   console.log(`Node : ${node}`.yellow);
-  //   console.log(`EventRoot : ${publicEventRoot}`.yellow);
-  //   console.log(`mode : ${mode}`.yellow);
-  //   console.log(`sideKey : ${sideKey}`.yellow);
-
-  // Try fetching from MAM
-  console.log("Fetching from tangle, please wait...");
-  const fetched = await mamFetch(node, publicEventRoot, mode, sideKey);
-  if (fetched) {
-    let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-    nextMAMRoot = fetched.nextRoot;
-    //DEBUGINFO
-    // console.log("MAMdata ===================".red);
-    // console.log(`fetched : ${fetched.message}`.green);
-    // console.log(`fmessage : ${fMessage}`);
-    // console.log(`nextMAMRoot : ${nextMAMRoot}`);
-    return fMessage;
-  }
-  console.log("Nothing was fetched from the MAM channel".red);
-  return;
 }
 
 function presentEventInfo(eventRecord) {
@@ -154,45 +125,15 @@ function presentEventInfo(eventRecord) {
   console.log("=================================".red);
 }
 
-async function loadAttendeeTokens() {
+function loadAttendeeTokens(mamAttendeeMessage) {
   // readAttendeeList -till ClosedMessage
-  const mode = "restricted";
-  const sideKey = commonSideKey;
   let aList = [];
-  //DEBUGINFO
-  //   console.log("Fetching attendeeIDs from tangle with this information :");
-  //   console.log(`Node : ${node}`.yellow);
-  //   console.log(`EventRoot : ${nextMAMRoot}`.yellow);
-  //   console.log(`mode : ${mode}`.yellow);
-  //   console.log(`sideKey : ${sideKey}`.yellow);
 
-  // Try fetching from MAM
-  let readMAM = true;
-  while (readMAM) {
-    // readMAMrecord
-    // console.log("ReadMAM ===========".red);
-    const fetched = await mamFetch(node, nextMAMRoot, mode, sideKey);
-    // console.log(`fetched : ${fetched.message}`.green);
+  let fMessage = getEventInfo(mamAttendeeMessage);
+  aList = aList.concat(fMessage.ids);
+  // console.log("attendeeList ========");
+  // console.log(`aList : ${aList}`.yellow);
 
-    if (fetched) {
-      let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
-      //   console.log(`fMessage : ${fMessage}`.cyan);
-      nextMAMRoot = fetched.nextRoot;
-      //DEBUGINFO
-      //   console.log("MAMdata ===================".red);
-      //   console.log(`fetched : ${fMessage.count}`.green);
-      if (fMessage.message == "Event closed") {
-        console.log(
-          `Eventregistration closed at : ${fMessage.date} =====`.cyan
-        );
-        readMAM = false;
-      } else {
-        aList = aList.concat(fMessage.ids);
-        // console.log("attendeeList ========");
-        // console.log(`aList : ${aList}`.yellow);
-      }
-    }
-  }
   return aList;
 }
 
@@ -218,19 +159,21 @@ async function run() {
     return;
   } else {
     // readEventInfo
-    eventInformation = await readPublicEventInfo(publicEventRoot);
-    // console.log(eventInformation);
+    let allMamData = await readWholeMam(publicEventRoot);
+    eventInformation = getEventInfo(allMamData[0]);
     if (eventInformation.eventPublicKey.length > 0) {
       // show eventinfo
       presentEventInfo(eventInformation);
-      if (await mamStillOpenStatus()) {
+      if (mamStillOpenStatus(allMamData)) {
         console.log(
           `Eventregistration is open at this moment, no check possible.`
             .brightRed
         );
         return;
       }
-      const attendeeList = await loadAttendeeTokens();
+      console.log(`The eventregistration was closed at : ${mamClosedTime}`);
+
+      const attendeeList = loadAttendeeTokens(allMamData[1]);
       // checkAttendeeOnList
       checkAttended(attendeeToken, attendeeList);
     }
