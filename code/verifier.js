@@ -64,7 +64,7 @@ async function checkQR(code) {
   //   console.log(`idstring :${idstring}`);
   //   console.log(`rootcode :${rootcode}`);
   //   console.log(`timecode :${timecode}`);
-  //   console.log(`rest :${rest}`);   BGBHAIFFGGFJA
+  //   console.log(`rest :${rest}`);
 
   let crcValueString = await hashHash(rest);
   let crcValue = crcValueString.slice(-5);
