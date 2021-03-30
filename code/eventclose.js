@@ -298,21 +298,18 @@ async function mamClosedStatus() {
 
   console.log("Checking if event was closed..".yellow);
   let mamOpenStatus = true;
+  let fMessage = "";
   const fetched = await mamFetchAll(node, publicEventRoot, mode, sideKey);
   if (fetched && fetched.length > 0) {
     for (let i = 0; i < fetched.length; i++) {
       const element = fetched[i].message;
-      let fMessage = JSON.parse(TrytesHelper.toAscii(element));
-      if (fMessage.message == "Event closed") {
-        mamOpenStatus = false;
-        console.log(
-          `Eventregistration was closed at : ${fMessage.date}`.brightRed
-        );
-      } else {
-        console.log(`Eventregistration is still open`.brightGreen);
-      }
+      fMessage = JSON.parse(TrytesHelper.toAscii(element));
+      if (fMessage.message == "Event closed") mamOpenStatus = false;
     }
   }
+  if (mamOpenStatus) console.log(`Eventregistration is still open`.brightGreen);
+  else
+    console.log(`Eventregistration was closed at : ${fMessage.date}`.brightRed);
   return mamOpenStatus;
 }
 
