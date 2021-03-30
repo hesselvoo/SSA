@@ -9,14 +9,14 @@ The code-dir has a JS-file for 4 modules:
 
 - organiser.js
 - attendee.js
-- closeevent.js
+- eventclose.js
 - verifier.js
 
 **organiser.js** : registers the eventinformation on the Tangle and generates a QRcode (expirytime +20min.) for the attendee to find the eventinfo.
 
 **attendee.js** : looks up the event on the Tangle, registers the attendee and generates a verifierQR (as a demo)
 
-**closeevent.js** : makes a list of all attendees who registered, writes is to the Tangle and closes the event.
+**eventclose.js** : makes a list of all attendees who registered, writes is to the Tangle and closes the event.
 
 **verifier.js** : reads the verifierQR and checks on the Tangle at the event if the attendee was registered.
 
