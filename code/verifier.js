@@ -15,7 +15,6 @@ const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
   "SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSACOMMONKEY9SSA";
 let publicEventRoot = "";
-let verificationQR = "";
 let attendeeToken = "";
 let qrTime = "";
 let eventInformation = "";
@@ -44,6 +43,17 @@ function readQR() {
 
 async function checkQR(code) {
   // check integrity of QR-code
+
+  function timeDec(invoer) {
+    //decrypt
+    const epocCharSet = "KFU9EBPOSQ";
+    let timeWord = "";
+    for (let i = 0; i < invoer.length; i++) {
+      timeWord += epocCharSet.indexOf(invoer[i]);
+    }
+    return timeWord;
+  }
+
   let crccode = code.slice(-5).toLowerCase();
   let idstring = code.slice(0, 64).toLowerCase();
   let rootcode = code.slice(64, -18);
@@ -54,7 +64,7 @@ async function checkQR(code) {
   //   console.log(`idstring :${idstring}`);
   //   console.log(`rootcode :${rootcode}`);
   //   console.log(`timecode :${timecode}`);
-  //   console.log(`rest :${rest}`);
+  //   console.log(`rest :${rest}`);   BGBHAIFFGGFJA
 
   let crcValueString = await hashHash(rest);
   let crcValue = crcValueString.slice(-5);
@@ -62,12 +72,12 @@ async function checkQR(code) {
     publicEventRoot = rootcode;
     attendeeToken = await hashHash(idstring);
     // console.log(`attendeeToken :${attendeeToken}`);
-    qrTime = luxon.DateTime.fromMillis(+timecode);
+    qrTime = luxon.DateTime.fromMillis(parseInt(timeDec(timecode)));
     nowTime = luxon.DateTime.now();
     let timeDiff = nowTime.diff(qrTime);
-    if (timeDiff.as(`minutes`) > 10)
+    if (timeDiff.as(`minutes`) > 5)
       console.log(
-        `Suspicious behaviour : QR-code is older than 10 minutes!`.underline
+        `Suspicious behaviour : QR-code is older than 5 minutes!`.underline
           .brightRed
       );
     console.log(
@@ -141,7 +151,7 @@ function checkAttended(ID, idList) {
   // check if attendeeID is on the list of registeredIDs
   // ID = ID + "a";      // to test if not registered
   if (idList.indexOf(ID) === -1) {
-    console.log(`ID : ${ID} was not registered at this event!`.brightRed);
+    console.log(`ID : ${ID} was NOT registered at this event!`.brightRed);
     return false;
   } else {
     console.log(`ID : ${ID} has attended this event.`.green);
@@ -151,9 +161,12 @@ function checkAttended(ID, idList) {
 
 async function run() {
   console.log("SSA-verifier-app".cyan);
-  verificationQR = readQR();
-  console.log(`VerificationQR : ${verificationQR}`);
-  qrOkay = await checkQR(verificationQR);
+  let verificationQR = readQR();
+  console.log(`VerificationQR : ${verificationQR}`.yellow);
+  let eventQR = prompt("Verification QR-code (*=savedversion): ");
+  if (eventQR === "*") eventQR = verificationQR;
+
+  qrOkay = await checkQR(eventQR);
   if (!qrOkay) {
     console.log("-- Verification aborted --".red);
     return;

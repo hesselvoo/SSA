@@ -42,11 +42,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-<<<<<<< HEAD
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
-=======
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d0";
->>>>>>> main
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d6";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -198,7 +194,7 @@ async function mamInteract(eventQR) {
 
   const payload0 = {
     attendeeID: merkleHash2,
-    remark: "QWERT", //HINT optional, can remain empty. Will be striped by closeevent.
+    remark: "Emmen", //HINT optional, can remain empty. Will be striped by closeevent.
     timestamp: new Date().toLocaleString(),
   };
 
@@ -246,9 +242,28 @@ async function mamInteract(eventQR) {
   // CRC = last 5 digits of sha256, to check if QR is manipulated
   // convert to Uppercase so you can hardly see where hash ends
   // and make it harder to calculate hash of a manipulated code
+
+  function encTime(invoer) {
+    //encrypt
+    const epocCharSet = "KFU9EBPOSQ";
+    console.log(`Invoer : ${invoer}`);
+    let timeWord = "";
+    for (let i = 0; i < invoer.length; i++) {
+      timeWord += epocCharSet.charAt(parseInt(invoer[i]));
+    }
+    console.log(`Uitvoer : ${timeWord}`);
+    return timeWord;
+  }
+
   const merkleHash = await hashHash(eventPersonalMerkleRoot);
   const nowEpoch = luxon.DateTime.now().toMillis();
-  let verifierQR = bufferToHex(merkleHash) + publicEventRoot + nowEpoch;
+  let stringWaarde = "";
+  stringWaarde += nowEpoch;
+  console.log(
+    `now = ${nowEpoch}  +  ${encTime(stringWaarde)} - ${stringWaarde}`
+  );
+  let verifierQR =
+    bufferToHex(merkleHash) + publicEventRoot + encTime(stringWaarde);
   const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
   verifierQR += crcCheck.slice(-5);
   verifierQR = verifierQR.toUpperCase();
