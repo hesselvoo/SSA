@@ -42,7 +42,11 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
+<<<<<<< HEAD
   "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
+=======
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d0";
+>>>>>>> main
 let eventPersonalMerkleRoot;
 
 function readQR() {
