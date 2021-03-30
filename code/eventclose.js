@@ -282,7 +282,7 @@ async function closeEvent(attendeeIndex) {
   const { messageId } = await mamAttach(node, mamMessage, "SSA9EXPERIMENT");
   console.log(`Message Id`, messageId);
   console.log(
-    `You can view the mam channel here https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
+    `You can view the mam channel here \n https://explorer.iota.org/chrysalis/streams/0/${mamMessage.root}/${mode}/${sideKey}`
   );
   console.log("===============================".yellow);
   await writeCloseMessage(channelState);
@@ -391,11 +391,11 @@ async function run() {
       // show the details of the current transactions on the Tangle
       await detailedList(attendancyAddress);
     }
-    if (menuChoice == "a") {
-      // show the list of official attendeeTokens
+    if (menuChoice == "a" && !mamOpen) {
+      // show the list of official decrypted attendeeTokens
       await officialAttendeeList();
     }
-    if (menuChoice == "c") {
+    if (menuChoice == "c" && mamOpen) {
       // close the event and write the official attendeelist
       await closeEvent(attendancyAddress);
     }
