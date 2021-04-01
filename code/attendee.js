@@ -21,7 +21,7 @@ const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
-const { resolve } = require("path");
+// const { resolve } = require("path");
 // const { Console } = require("console");
 
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
