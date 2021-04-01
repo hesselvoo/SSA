@@ -18,3 +18,13 @@ const colors = require("colors");
 // readWallet
 // generateQR
 // writeQR
+
+function saveVerifierQR(verifierdata) {
+  // Store QR-code for verifier so we can use it in verifier.js
+  console.log("Save VerifierQR >>>>>>>>".green);
+  try {
+    fs.writeFileSync("./verifierQR.json", verifierdata);
+  } catch (e) {
+    console.error(e);
+  }
+}

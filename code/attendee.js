@@ -146,6 +146,37 @@ function saveVerifierQR(verifierdata) {
   }
 }
 
+function saveInfoToWallet() {
+  // write information about the event to Wallet
+  // include the peronal information also because
+  // this could change over time.
+
+  // mr should be constructed from personalInfo
+  // included just for demopurposes
+  const payload = {
+    firstname: personalFirstName,
+    lastname: personalSurname,
+    birthdate: personalBirthdate,
+    mail: personalMail,
+    organisation: organisation,
+    did: personalDID,
+    mr: personalMerkleRoot,
+    er: publicEventRoot,
+  };
+
+  // Store personal eventinformation in Wallet
+  // to be used for generating a new verifierQR anytime
+  console.log("Save data to wallet >>>>>>>>".green);
+  try {
+    fs.writeFileSync(
+      "./personalWallet.json",
+      JSON.stringify(payload, undefined, "\t")
+    );
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function hashHash(mroot) {
   let element = utf8ToBuffer(mroot);
   element = await sha256(element);
@@ -237,6 +268,8 @@ async function mamInteract(eventQR) {
   // console.log(`Payload : `);
   // console.dir(encrypted);
   console.log("Received Message Id", sendResult.messageId);
+
+  saveInfoToWallet();
 
   // compileVerifierQR
   // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
