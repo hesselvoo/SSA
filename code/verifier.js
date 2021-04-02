@@ -159,10 +159,33 @@ function checkAttended(ID, idList) {
   }
 }
 
+function degarble(txt) {
+  let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let dict = "5TXY6VWD8BEF7CUHI2RSZ34LM9ANOGJK01PQ";
+  let key = txt.slice(-1);
+  let cipherwaarde = dict.indexOf(key);
+
+  let z = "";
+  for (let i = 0; i < txt.length - 1; i++) {
+    let letter = dict.indexOf(txt[i]) - cipherwaarde;
+    if (letter < 0) letter += 36;
+    z += base[letter];
+  }
+  let schuif = cipherwaarde % 31;
+  let arretje = z.split("");
+  for (let s = 0; s < schuif; s++) {
+    l = arretje.pop();
+    arretje.unshift(l);
+  }
+  z = arretje.join("");
+  return z;
+}
+
 async function run() {
   console.log("SSA-verifier-app".cyan);
   let verificationQR = readQR();
-  console.log(`VerificationQR : ${verificationQR}`.yellow);
+  console.log(`VerificationQR : ${verificationQR}`.green);
+  verificationQR = degarble(verificationQR);
   let eventQR = prompt("Verification QR-code (*=savedversion): ");
   if (eventQR === "*") eventQR = verificationQR;
 

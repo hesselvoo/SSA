@@ -288,6 +288,27 @@ async function mamInteract(eventQR) {
     return timeWord;
   }
 
+  function engarble(txt) {
+    // encrypt verifierQR
+    let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let dict = "5TXY6VWD8BEF7CUHI2RSZ34LM9ANOGJK01PQ";
+    let cipherwaarde = Math.floor(Math.random() * 36);
+    let key = dict[cipherwaarde];
+    let z = "";
+
+    for (let i = 0; i < txt.length; i++) {
+      z += dict[(base.indexOf(txt[i]) + cipherwaarde) % 36];
+    }
+    let schuif = cipherwaarde % 31;
+    let arretje = z.split("");
+    for (let s = 0; s < schuif; s++) {
+      l = arretje.shift();
+      arretje.push(l);
+    }
+    z = arretje.join("") + key;
+    return z;
+  }
+
   const merkleHash = await hashHash(eventPersonalMerkleRoot);
   const nowEpoch = luxon.DateTime.now().toMillis();
   let stringWaarde = "";
@@ -297,7 +318,8 @@ async function mamInteract(eventQR) {
   const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
   verifierQR += crcCheck.slice(-5);
   verifierQR = verifierQR.toUpperCase();
-  console.log(`VerifierQR : ${verifierQR}`.yellow);
+  verifierQR = engarble(verifierQR);
+  console.log(`VerifierQR : ${verifierQR}`.green);
   saveVerifierQR(verifierQR);
 }
 
