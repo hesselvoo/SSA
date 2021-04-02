@@ -9,8 +9,6 @@ const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
 
-// let eventPersonalMerkleRoot = "";
-
 async function readInfoFromWallet() {
   // Try and load the wallet personalinfo from json file
   let parsedData;
@@ -43,7 +41,7 @@ async function hashHash(mroot) {
 }
 
 function encTime(invoer) {
-  //encrypt
+  //encrypt timestamp
   const epocCharSet = "KFU9EBPOSQ";
   let timeWord = "";
   for (let i = 0; i < invoer.length; i++) {
@@ -73,7 +71,7 @@ function engarble(txt) {
   return z;
 }
 
-// readWallet
+// readWalletInformation
 // generateQR
 // writeQR
 
