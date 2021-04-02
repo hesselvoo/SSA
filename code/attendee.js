@@ -42,7 +42,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d4";
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -270,57 +270,6 @@ async function mamInteract(eventQR) {
   console.log("Received Message Id", sendResult.messageId);
 
   saveInfoToWallet();
-
-  // compileVerifierQR
-  // combine Hash(personalMerkleRoot)+publicEventRoot+Timestamp+CRC
-  // Timestamp to check is it a recent QR
-  // CRC = last 5 digits of sha256, to check if QR is manipulated
-  // convert to Uppercase so you can hardly see where hash ends
-  // and make it harder to calculate hash of a manipulated code
-
-  // function encTime(invoer) {
-  //   //encrypt
-  //   const epocCharSet = "KFU9EBPOSQ";
-  //   let timeWord = "";
-  //   for (let i = 0; i < invoer.length; i++) {
-  //     timeWord += epocCharSet.charAt(parseInt(invoer[i]));
-  //   }
-  //   return timeWord;
-  // }
-
-  // function engarble(txt) {
-  //   // encrypt verifierQR
-  //   let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  //   let dict = "5TXY6VWD8BEF7CUHI2RSZ34LM9ANOGJK01PQ";
-  //   let cipherwaarde = Math.floor(Math.random() * 36);
-  //   let key = dict[cipherwaarde];
-  //   let z = "";
-
-  //   for (let i = 0; i < txt.length; i++) {
-  //     z += dict[(base.indexOf(txt[i]) + cipherwaarde) % 36];
-  //   }
-  //   let schuif = cipherwaarde % 31;
-  //   let arretje = z.split("");
-  //   for (let s = 0; s < schuif; s++) {
-  //     l = arretje.shift();
-  //     arretje.push(l);
-  //   }
-  //   z = arretje.join("") + key;
-  //   return z;
-  // }
-
-  // const merkleHash = await hashHash(eventPersonalMerkleRoot);
-  // const nowEpoch = luxon.DateTime.now().toMillis();
-  // let stringWaarde = "";
-  // stringWaarde += nowEpoch;
-  // let verifierQR =
-  //   bufferToHex(merkleHash) + publicEventRoot + encTime(stringWaarde);
-  // const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
-  // verifierQR += crcCheck.slice(-5);
-  // verifierQR = verifierQR.toUpperCase();
-  // verifierQR = engarble(verifierQR);
-  // console.log(`VerifierQR : ${verifierQR}`.green);
-  // saveVerifierQR(verifierQR);
 }
 
 console.log("SSA-attendee-app".cyan);

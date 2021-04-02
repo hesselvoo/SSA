@@ -220,9 +220,9 @@ async function run() {
       if (personalInfo) {
         console.log(
           `Included personalinformation : ${personalInfo.slice(0, -2)}`.yellow
-        ) else {
-          console.log(`NO personal information was included`.red);
-        };
+        );
+      } else {
+        console.log(`NO personal information was included`.red);
       }
 
       checkAttended(attendeeToken, attendeeList);
