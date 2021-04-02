@@ -45,15 +45,6 @@ function readQR() {
 async function checkQR(code) {
   // check integrity of QR-code
 
-  function timeDec(invoer) {
-    //decrypt
-    const epocCharSet = "KFU9EBPOSQ";
-    let timeWord = "";
-    for (let i = 0; i < invoer.length; i++) {
-      timeWord += epocCharSet.indexOf(invoer[i]);
-    }
-    return timeWord;
-  }
   let codeLength = code.length;
   if (codeLength > 164) {
     // length indicates personalInformation is included
@@ -79,7 +70,7 @@ async function checkQR(code) {
     publicEventRoot = rootcode;
     attendeeToken = await hashHash(idstring);
     // console.log(`attendeeToken :${attendeeToken}`);
-    qrTime = luxon.DateTime.fromMillis(parseInt(timeDec(timecode)));
+    qrTime = luxon.DateTime.fromMillis(parseInt(timecode));
     nowTime = luxon.DateTime.now();
     let timeDiff = nowTime.diff(qrTime);
     if (timeDiff.as(`minutes`) > 5)

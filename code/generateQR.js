@@ -40,16 +40,6 @@ async function hashHash(mroot) {
   return bufferToHex(element);
 }
 
-function encTime(invoer) {
-  //encrypt timestamp
-  const epocCharSet = "KFU9EBPOSQ";
-  let timeWord = "";
-  for (let i = 0; i < invoer.length; i++) {
-    timeWord += epocCharSet.charAt(parseInt(invoer[i]));
-  }
-  return timeWord;
-}
-
 function engarble(txt) {
   // encrypt verifierQR
   let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -94,7 +84,7 @@ async function run() {
   let stringWaarde = "";
   stringWaarde += nowEpoch;
   let verifierQR =
-    bufferToHex(merkleHash) + personalInformation.er + encTime(stringWaarde);
+    bufferToHex(merkleHash) + personalInformation.er + stringWaarde;
   let personalString = "";
   if (includePersonalData)
     personalString = `${personalInformation.firstname} ${personalInformation.lastname}, ${personalInformation.birthdate}//`;
