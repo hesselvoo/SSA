@@ -19,6 +19,7 @@ let attendeeToken = "";
 let qrTime = "";
 let eventInformation = "";
 let mamClosedTime = "";
+let personalInfo = "";
 
 async function hashHash(hashData) {
   let element = utf8ToBuffer(hashData);
@@ -53,12 +54,18 @@ async function checkQR(code) {
     }
     return timeWord;
   }
-
+  let codeLength = code.length;
+  if (codeLength > 164) {
+    // length indicates personalInformation is included
+    personalInfo = code.slice(0, codeLength - 164);
+    code = code.slice(-164);
+  }
+  code = degarble(code);
   let crccode = code.slice(-5).toLowerCase();
   let idstring = code.slice(0, 64).toLowerCase();
   let rootcode = code.slice(64, -18);
   let timecode = code.slice(-18, -5);
-  let rest = idstring + rootcode + timecode + "SSAsaltQ3v%";
+  let rest = idstring + rootcode + timecode + personalInfo + "SSAsaltQ3v%";
   //DEBUGINFO
   //   console.log(`crccode :${crccode}`);
   //   console.log(`idstring :${idstring}`);
@@ -185,7 +192,6 @@ async function run() {
   console.log("SSA-verifier-app".cyan);
   let verificationQR = readQR();
   console.log(`VerificationQR : ${verificationQR}`.green);
-  verificationQR = degarble(verificationQR);
   let eventQR = prompt("Verification QR-code (*=savedversion): ");
   if (eventQR === "*") eventQR = verificationQR;
 
@@ -211,6 +217,14 @@ async function run() {
 
       const attendeeList = loadAttendeeTokens(allMamData[1]);
       // checkAttendeeOnList
+      if (personalInfo) {
+        console.log(
+          `Included personalinformation : ${personalInfo.slice(0, -2)}`.yellow
+        ) else {
+          console.log(`NO personal information was included`.red);
+        };
+      }
+
       checkAttended(attendeeToken, attendeeList);
     }
   }

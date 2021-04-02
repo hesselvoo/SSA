@@ -81,6 +81,12 @@ async function run() {
   // generate a new verifierQRcode for a past event from personalWallet
 
   console.log(`VerifierQRcode-generator`.cyan);
+  let includePersonalData = false;
+  let menuChoice = prompt(
+    `Would you like to incorporate your Name and Birthdate? [y,N] : `.yellow
+  );
+  if (menuChoice.toUpperCase() === "Y") includePersonalData = true;
+
   console.log(`Generating....`);
   const personalInformation = await readInfoFromWallet();
   console.log(`mr : ${personalInformation.mr}`);
@@ -91,10 +97,14 @@ async function run() {
   stringWaarde += nowEpoch;
   let verifierQR =
     bufferToHex(merkleHash) + personalInformation.er + encTime(stringWaarde);
-  const crcCheck = await hashHash(verifierQR + "SSAsaltQ3v%");
+  let personalString = "";
+  if (includePersonalData)
+    personalString = `${personalInformation.firstname} ${personalInformation.lastname}, ${personalInformation.birthdate}//`;
+  const crcCheck = await hashHash(verifierQR + personalString + "SSAsaltQ3v%");
   verifierQR += crcCheck.slice(-5);
   verifierQR = verifierQR.toUpperCase();
   verifierQR = engarble(verifierQR);
+  if (includePersonalData) verifierQR = personalString + verifierQR;
   console.log(`VerifierQR : ${verifierQR}`.green);
   saveVerifierQR(verifierQR);
 }
