@@ -1,20 +1,23 @@
 # Node-SSA-app
 
 This is the Self Sovereign Attendancy application.
-Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (and with LOTS of remarks en debuginfo in the source -over 50%-).
+Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (with LOTS of explanation en debuginfo in the source -over 50%-).
 
 The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/ and an animationvideo about it can be found here : https://www.youtube.com/watch?v=VDKABf8hmFI
 
-The code-dir has a JS-file for 4 modules:
+The code-dir has a JS-file for 5 modules:
 
 - organiser.js
 - attendee.js
+- generateQR.js
 - eventclose.js
 - verifier.js
 
 **organiser.js** : registers the eventinformation on the Tangle and generates a QRcode (expirytime +20min.) for the attendee to find the eventinfo.
 
-**attendee.js** : looks up the event on the Tangle, registers the attendee and generates a verifierQR (as a demo)
+**attendee.js** : looks up the event on the Tangle and asks the attendee if he/she wants to register (optional remark).
+
+**generateQR.js** : lets the attendee generate a verifierQR (anonymous or with personal information -if the verifier demands-)
 
 **eventclose.js** : makes a list of all attendees who registered, writes is to the Tangle and closes the event.
 
