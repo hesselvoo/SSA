@@ -37,7 +37,7 @@ function getEventInfo(mamData) {
 function readQR() {
   // Try and load the QR-root from file - as substitute for QRscan from camera
   try {
-    const data = fs.readFileSync("./verifierQR.json", "utf8");
+    const data = fs.readFileSync("./json/verifierQR.json", "utf8");
     return data;
   } catch (err) {}
 }

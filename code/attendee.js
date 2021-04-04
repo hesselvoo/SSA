@@ -48,7 +48,7 @@ let eventPersonalMerkleRoot;
 function readQR() {
   // Try and load the QR-root from file - as substitute for QRscan from camera
   try {
-    const data = fs.readFileSync("./QRcode.json", "utf8");
+    const data = fs.readFileSync("./json/QRcode.json", "utf8");
     return data;
   } catch (err) {}
 }
@@ -140,7 +140,7 @@ function saveVerifierQR(verifierdata) {
   // Store QR-code for verifier so we can use it in verifier.js
   console.log("Save VerifierQR >>>>>>>>".green);
   try {
-    fs.writeFileSync("./verifierQR.json", verifierdata);
+    fs.writeFileSync("./json/verifierQR.json", verifierdata);
   } catch (e) {
     console.error(e);
   }
@@ -169,7 +169,7 @@ function saveInfoToWallet() {
   console.log("Save data to wallet >>>>>>>>".green);
   try {
     fs.writeFileSync(
-      "./personalWallet.json",
+      "./json/personalWallet.json",
       JSON.stringify(payload, undefined, "\t")
     );
   } catch (e) {
