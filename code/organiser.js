@@ -93,7 +93,7 @@ function saveChannelState() {
   console.log("Save channelstate >>>>>>>>".green);
   try {
     fs.writeFileSync(
-      "./channelState.json",
+      "./json/channelState.json",
       JSON.stringify(channelState, undefined, "\t")
     );
   } catch (e) {
@@ -105,7 +105,7 @@ function saveQR(qrcode) {
   // save QRcode so we can use it in attendee.js
   console.log("Save QRcode >>>>>>>>".green);
   try {
-    fs.writeFileSync("./QRcode.json", qrcode);
+    fs.writeFileSync("./json/QRcode.json", qrcode);
   } catch (e) {
     console.error(e);
   }
@@ -123,7 +123,7 @@ function saveSEEDnPassword() {
 
   console.log("Save EventSEED >>>>>>>>".green);
   try {
-    fs.writeFileSync("./Wallet.json", eventWalletInfo);
+    fs.writeFileSync("./json/Wallet.json", eventWalletInfo);
   } catch (e) {
     console.error(e);
   }

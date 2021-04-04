@@ -34,7 +34,7 @@ let mamOpen = true;
 async function readWallet() {
   // Try and load the wallet state from json file
   try {
-    const currentState = fs.readFileSync("./Wallet.json");
+    const currentState = fs.readFileSync("./json/Wallet.json");
     if (currentState) {
       walletState = JSON.parse(currentState.toString());
     }
@@ -209,7 +209,7 @@ async function writeCloseMessage(mamChannelState) {
   // writeMAMstate for appending extra information
   try {
     fs.writeFileSync(
-      "./channelState.json",
+      "./json/channelState.json",
       JSON.stringify(mamChannelState, undefined, "\t")
     );
   } catch (e) {
@@ -256,7 +256,7 @@ async function closeEvent(attendeeIndex) {
 
   // loadchannelState from imaginary organiserWallet
   try {
-    const currentState = fs.readFileSync("./channelState.json");
+    const currentState = fs.readFileSync("./json/channelState.json");
     if (currentState) {
       channelState = JSON.parse(currentState.toString());
     }

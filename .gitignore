@@ -124,6 +124,9 @@ dist/
 tmp/
 temp/
 
+#
+ideas.txt
+
 # Parameter-saving files
 QRcode.json
 Wallet.json

@@ -13,7 +13,7 @@ async function readInfoFromWallet() {
   // Try and load the wallet personalinfo from json file
   let parsedData;
   try {
-    const personalInformation = fs.readFileSync("./personalWallet.json");
+    const personalInformation = fs.readFileSync("./json/personalWallet.json");
     if (personalInformation) {
       parsedData = JSON.parse(personalInformation.toString());
     }
@@ -28,7 +28,7 @@ async function saveVerifierQR(verifierdata) {
   // Store QR-code for verifier so we can use it in verifier.js
   console.log("Save VerifierQR >>>>>>>>".green);
   try {
-    fs.writeFileSync("./verifierQR.json", verifierdata);
+    fs.writeFileSync("./json/verifierQR.json", verifierdata);
   } catch (e) {
     console.error(e);
   }
