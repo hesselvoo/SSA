@@ -216,7 +216,7 @@ async function makeQRmam(
   // timestamp - expiryDateTime
 
   const mode = "restricted";
-  const sideKey = "DATE"; //TODO change for dynamic UTC-date?
+  const sideKey = "DATE"; //TODO change for dynamic password?
   let channelQRState;
 
   const payloadQR = {
@@ -231,7 +231,11 @@ async function makeQRmam(
 
   attendeeQRcode = "SSA" + generateSeed(78);
   console.log(`Attendee QR-seed : ${attendeeQRcode}`.cyan);
-
+  console.log(`You can use this QR-code to show to your attendees :`);
+  console.log(
+    `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${attendeeQRcode}`
+      .yellow
+  );
   channelQRState = createChannel(attendeeQRcode, 2, mode, sideKey);
 
   const mamMessage = createMessage(

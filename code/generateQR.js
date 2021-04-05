@@ -95,6 +95,11 @@ async function run() {
   if (includePersonalData) verifierQR = personalString + verifierQR;
   console.log(`VerifierQR : ${verifierQR}`.green);
   saveVerifierQR(verifierQR);
+  console.log(`You can use this QR-code to show to your verifier :`);
+  console.log(
+    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${verifierQR}`
+      .yellow
+  );
 }
 
 run();
