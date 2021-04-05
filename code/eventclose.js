@@ -2,6 +2,7 @@
 // Organiser eventclose-app
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
+"use strict";
 
 const { bufferToHex, hexToBuffer, decrypt } = require("eccrypto-js");
 const eccryptoJS = require("eccrypto-js");
@@ -30,6 +31,8 @@ let attendancyAddress = "";
 let nextMAMRoot = "";
 let eventInformation = "";
 let mamOpen = true;
+let publicEventRoot = "";
+let channelState = "";
 
 async function readWallet() {
   // Try and load the wallet state from json file
@@ -63,7 +66,7 @@ async function readPrivateOrganiserInfo() {
   if (fetched) {
     let fMessage = JSON.parse(TrytesHelper.toAscii(fetched.message));
     // console.log("Fetched : ", fMessage);
-    eventTitle = fMessage.title;
+    const eventTitle = fMessage.title;
     privateOrgPrivateEventKey = hexToBuffer(fMessage.ePKey);
     publicEventRoot = fetched.nextRoot;
   } else {
@@ -146,7 +149,9 @@ async function getAttendee(attendeeMessageID) {
   const client = new SingleNodeClient(node);
   // console.log(`Retrieving : ${attendeeMessageID}`.dim);
   const transactionDataRAW = await retrieveData(client, attendeeMessageID);
-  transactionData = JSON.parse(Converter.bytesToUtf8(transactionDataRAW.data));
+  const transactionData = JSON.parse(
+    Converter.bytesToUtf8(transactionDataRAW.data)
+  );
   //DEBUGINFO
   // console.log(`Raw : ${transactionData}`);
   // console.dir(transactionData);
@@ -158,7 +163,7 @@ async function getAttendee(attendeeMessageID) {
       ciphertext: hexToBuffer(transactionData.c),
       mac: hexToBuffer(transactionData.d),
     };
-    decrypted = await decrypt(privateOrgPrivateEventKey, encryptedData);
+    const decrypted = await decrypt(privateOrgPrivateEventKey, encryptedData);
     return decrypted;
   }
 }

@@ -2,7 +2,7 @@
 // Organiser init-event-app
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
-
+"use strict";
 const { bufferToHex, generateKeyPair } = require("eccrypto-js");
 const {
   createChannel,
@@ -15,6 +15,7 @@ const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
+const { strict } = require("assert");
 
 const node = "https://api.lb-0.testnet.chrysalis2.com/";
 
@@ -114,7 +115,7 @@ function saveQR(qrcode) {
 function saveSEEDnPassword() {
   // save eventSEED and eventPassword in (imaginery) organiserswallet
 
-  eventWalletInfo = `{
+  const eventWalletInfo = `{
     "seed":"${eventSEED}",
     "password":"${organiserKey}",
     "indexation":"${attendanceNotificationKey}",

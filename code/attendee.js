@@ -2,6 +2,7 @@
 // Attendee attend-event-app
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
+"use strict";
 const { sendData, SingleNodeClient, Converter } = require("@iota/iota.js");
 
 const {
@@ -42,7 +43,7 @@ const personalDID = "did:example:123456789abcdefghi#key-1";
 const organisation = "International Red Cross";
 // for demo-purpose
 const personalMerkleRoot =
-  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d7";
+  "ec76f5e70d24137494dbade31136119b52458b19105fd7e5b5812f4de38b82d5";
 let eventPersonalMerkleRoot;
 
 function readQR() {
@@ -252,7 +253,7 @@ async function mamInteract(eventQR) {
   };
   //DEBUGINFO
   // console.log("enc2");
-  encrypted = JSON.stringify(payloadEnc);
+  const encrypted = JSON.stringify(payloadEnc);
   // console.log(encrypted);
 
   console.log(`PublicKey : ${eventInformation.eventPublicKey}`.green);

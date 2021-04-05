@@ -2,6 +2,7 @@
 // Attendee generate QR-app
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
+"use strict";
 
 const { bufferToHex, sha256, utf8ToBuffer } = require("eccrypto-js");
 const luxon = require("luxon");
@@ -54,7 +55,7 @@ function engarble(txt) {
   let schuif = cipherwaarde % 31;
   let arretje = z.split("");
   for (let s = 0; s < schuif; s++) {
-    l = arretje.shift();
+    let l = arretje.shift();
     arretje.push(l);
   }
   z = arretje.join("") + key;

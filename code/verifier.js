@@ -2,6 +2,7 @@
 // Verifier verification-app
 // (c) A.J. Wischmann 2021
 //////////////////////////////////////////////////////////
+"use strict";
 
 const { mamFetchAll, TrytesHelper } = require("@iota/mam-chrysalis.js");
 const { Converter } = require("@iota/iota.js");
@@ -71,7 +72,7 @@ async function checkQR(code) {
     attendeeToken = await hashHash(idstring);
     // console.log(`attendeeToken :${attendeeToken}`);
     qrTime = luxon.DateTime.fromMillis(parseInt(timecode));
-    nowTime = luxon.DateTime.now();
+    let nowTime = luxon.DateTime.now();
     let timeDiff = nowTime.diff(qrTime);
     if (timeDiff.as(`minutes`) > 5)
       console.log(
@@ -171,7 +172,7 @@ function degarble(txt) {
   let schuif = cipherwaarde % 31;
   let arretje = z.split("");
   for (let s = 0; s < schuif; s++) {
-    l = arretje.pop();
+    let l = arretje.pop();
     arretje.unshift(l);
   }
   z = arretje.join("");
@@ -185,7 +186,7 @@ async function run() {
   let eventQR = prompt("Verification QR-code (*=savedversion): ");
   if (eventQR === "*") eventQR = verificationQR;
 
-  qrOkay = await checkQR(eventQR);
+  let qrOkay = await checkQR(eventQR);
   if (!qrOkay) {
     console.log("-- Verification aborted --".red);
     return;
