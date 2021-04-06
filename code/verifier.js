@@ -23,8 +23,9 @@ let mamClosedTime = "";
 let personalInfo = "";
 
 async function hashHash(hashData) {
-  let element = utf8ToBuffer(hashData);
-  element = await sha256(element);
+  // let element = utf8ToBuffer(hashData);
+  // element = await sha256(element);
+  element = await sha256(utf8ToBuffer(hashData));
   return bufferToHex(element);
 }
 
@@ -158,6 +159,8 @@ function checkAttended(ID, idList) {
 }
 
 function degarble(txt) {
+  // decrypts and unshifts
+
   let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let dict = "5TXY6VWD8BEF7CUHI2RSZ34LM9ANOGJK01PQ";
   let key = txt.slice(-1);
@@ -169,9 +172,9 @@ function degarble(txt) {
     if (letter < 0) letter += 36;
     z += base[letter];
   }
-  let schuif = cipherwaarde % 31;
+  let shifter = cipherwaarde % 31;
   let arretje = z.split("");
-  for (let s = 0; s < schuif; s++) {
+  for (let s = 0; s < shifter; s++) {
     let l = arretje.pop();
     arretje.unshift(l);
   }

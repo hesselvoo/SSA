@@ -153,7 +153,7 @@ function saveInfoToWallet() {
   // this could change over time.
 
   // mr should be constructed from personalInfo
-  // included just for demopurposes
+  // included just for demo-purposes
   const payload = {
     firstname: personalFirstName,
     lastname: personalSurname,
@@ -179,8 +179,9 @@ function saveInfoToWallet() {
 }
 
 async function hashHash(mroot) {
-  let element = utf8ToBuffer(mroot);
-  element = await sha256(element);
+  // let element = utf8ToBuffer(mroot);
+  // element = await sha256(element);
+  element = await sha256(utf8ToBuffer(mroot));
   return bufferToHex(element);
 }
 

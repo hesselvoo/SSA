@@ -199,11 +199,11 @@ async function writeCloseMessage(mamChannelState) {
   const mode = "restricted";
   const sideKey = commonSideKey;
 
-  let nu = luxon.DateTime.now();
+  let nowTime = luxon.DateTime.now();
 
   const payloadClose = {
     message: "Event closed",
-    date: nu.toISO(),
+    date: nowTime.toISO(),
   };
 
   const mamCloseMessage = createMessage(

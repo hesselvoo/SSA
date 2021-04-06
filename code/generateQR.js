@@ -36,25 +36,26 @@ async function saveVerifierQR(verifierdata) {
 }
 
 async function hashHash(mroot) {
-  let element = utf8ToBuffer(mroot);
-  element = await sha256(element);
+  // let element = utf8ToBuffer(mroot);
+  // element = await sha256(element);
+  element = await sha256(utf8ToBuffer(mroot));
   return bufferToHex(element);
 }
 
 function engarble(txt) {
-  // encrypt verifierQR
+  // encrypt and shift verifierQR
   let base = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let dict = "5TXY6VWD8BEF7CUHI2RSZ34LM9ANOGJK01PQ";
-  let cipherwaarde = Math.floor(Math.random() * 36);
-  let key = dict[cipherwaarde];
+  let cipherValue = Math.floor(Math.random() * 36);
+  let key = dict[cipherValue];
   let z = "";
 
   for (let i = 0; i < txt.length; i++) {
-    z += dict[(base.indexOf(txt[i]) + cipherwaarde) % 36];
+    z += dict[(base.indexOf(txt[i]) + cipherValue) % 36];
   }
-  let schuif = cipherwaarde % 31;
+  let shifted = cipherValue % 31;
   let arretje = z.split("");
-  for (let s = 0; s < schuif; s++) {
+  for (let s = 0; s < shifted; s++) {
     let l = arretje.shift();
     arretje.push(l);
   }
@@ -82,10 +83,9 @@ async function run() {
   let eventPersonalMerkleRoot = personalInformation.mr + personalInformation.er;
   const merkleHash = await hashHash(eventPersonalMerkleRoot);
   const nowEpoch = luxon.DateTime.now().toMillis();
-  let stringWaarde = "";
-  stringWaarde += nowEpoch;
+  let stringWord = nowEpoch;
   let verifierQR =
-    bufferToHex(merkleHash) + personalInformation.er + stringWaarde;
+    bufferToHex(merkleHash) + personalInformation.er + stringWord;
   let personalString = "";
   if (includePersonalData)
     personalString = `${personalInformation.firstname} ${personalInformation.lastname}, ${personalInformation.birthdate}//`;
