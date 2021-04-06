@@ -22,8 +22,6 @@ const luxon = require("luxon");
 const fs = require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
 const colors = require("colors");
-// const { resolve } = require("path");
-// const { Console } = require("console");
 
 const node = "https://api.hornet-0.testnet.chrysalis2.com";
 const commonSideKey =
@@ -137,16 +135,6 @@ function presentEventInfo(eventRecord) {
   console.log("=================================".red);
 }
 
-function saveVerifierQR(verifierdata) {
-  // Store QR-code for verifier so we can use it in verifier.js
-  console.log("Save VerifierQR >>>>>>>>".green);
-  try {
-    fs.writeFileSync("./json/verifierQR.json", verifierdata);
-  } catch (e) {
-    console.error(e);
-  }
-}
-
 function saveInfoToWallet() {
   // write information about the event to Wallet
   // include the peronal information also because
@@ -179,9 +167,7 @@ function saveInfoToWallet() {
 }
 
 async function hashHash(mroot) {
-  // let element = utf8ToBuffer(mroot);
-  // element = await sha256(element);
-  element = await sha256(utf8ToBuffer(mroot));
+  let element = await sha256(utf8ToBuffer(mroot));
   return bufferToHex(element);
 }
 

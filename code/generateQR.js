@@ -36,9 +36,7 @@ async function saveVerifierQR(verifierdata) {
 }
 
 async function hashHash(mroot) {
-  // let element = utf8ToBuffer(mroot);
-  // element = await sha256(element);
-  element = await sha256(utf8ToBuffer(mroot));
+  let element = await sha256(utf8ToBuffer(mroot));
   return bufferToHex(element);
 }
 

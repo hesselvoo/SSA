@@ -23,9 +23,7 @@ let mamClosedTime = "";
 let personalInfo = "";
 
 async function hashHash(hashData) {
-  // let element = utf8ToBuffer(hashData);
-  // element = await sha256(element);
-  element = await sha256(utf8ToBuffer(hashData));
+  let element = await sha256(utf8ToBuffer(hashData));
   return bufferToHex(element);
 }
 
