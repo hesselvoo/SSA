@@ -1,7 +1,7 @@
 # Node-SSA-app
 
-This is the Self Sovereign Attendancy application.
-Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (with LOTS of explanation en debuginfo in the source -over 50%-).
+This is the PoC of our Self Sovereign Attendancy application.
+Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (with LOTS of explanation en debuginfo in the source).
 
 The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/ and an animationvideo about it can be found here : https://www.youtube.com/watch?v=VDKABf8hmFI
 
@@ -28,7 +28,9 @@ The code-dir has a JS-file for 5 modules:
 To start playing with these examples run the following commands in your terminal:
 
 ```
-git clone https://github.com/IoTAdri/nodeSSA.git
+git clone https://gitlab.com/blockchainlabdrenthe/nodeSSA.git
+# or git clone https://gitlab.com/IoTAdri/nodeSSA.git
+# or git clone https://github.com/IoTAdri/nodeSSA.git
 cd nodeSSA
 npm install # or yarn install
 node code/organiser.js
@@ -38,7 +40,7 @@ You should see the SSA-organiser-app. You can answer both prompts with \* `[ente
 
 A technical desciption about the architecture/dataflow we used can be found in our Youtubechannel. In this lecture we gave for the DutchBlockchainWeek : https://www.youtube.com/watch?v=W-AVcImH0gY#t=48m08s
 
-You can find the demo/walkthrough-video of this PoC here : https://youtu.be/Y22PaJLW9k8
+You can find the demo/walkthrough-video of this PoC here : https://youtu.be/exjHvn2xgoY
 
 ---
 
