@@ -1,9 +1,30 @@
-# Node-SSA-app
+<h2 align="center">A Proof-of-Concept for Self Sovereign Attendancy application.</h2>
+
+<p align="center">
+  <a href="https://discord.com/invite/wTnDbDG/" style="text-decoration:none;"><img src="https://img.shields.io/badge/Discord-9cf.svg?logo=discord" alt="Discord"></a>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+</p>
+
+<p align="center">
+  <a href="#Node-SSA-app">Node SSA-application</a> ◈
+  <a href="#Use-case">Use Case</a> ◈
+  <a href="#Code">Code</a> ◈
+  <a href="#Getting-started">Getting started</a> ◈
+  <a href="#Remark">Remark</a>
+</p>
+
+---
+
+## Node-SSA-app
 
 This is the PoC of our Self Sovereign Attendancy application.
 Written for NodeJS as a PoC+ with securitymeasures built for IOTA-chrysalis with MAM-V0 (with LOTS of explanation en debuginfo in the source).
 
+## Use-case
+
 The use-case is described here : https://northsearegion.eu/bling/use-cases/use-case-1-blockchainlab-drenthe/ and an animationvideo about it can be found here : https://www.youtube.com/watch?v=VDKABf8hmFI
+
+## Code
 
 The code-dir has a JS-file for 5 modules:
 
@@ -25,7 +46,7 @@ The code-dir has a JS-file for 5 modules:
 
 ## Getting started
 
-To start playing with these examples run the following commands in your terminal:
+To start playing with these examples: install NodeJS on your machine and run the following commands in your terminal:
 
 ```
 git clone https://gitlab.com/blockchainlabdrenthe/nodeSSA.git
@@ -50,6 +71,12 @@ Information between the modules is shared through a JSON-file with minimal value
 
 It is all based upon IOTA-MAMchannels on the chrysalis-testnet. To be replaced with IOTA-Streams before final deployment.
 
+### Remark
+
 > (this code is far from optimal it is simply written show the workingprinciple and to serve as a startingpoint. It can ALWAYS use some refactoring/cleanup -it's a PoC- so PR's are welcome)
+
+This is a project within:
+
+![Bling](https://www.bcld.nl/wp-content/uploads/2019/09/BLING-RGB-02-A-colour-300x119.jpg)
 
 (c) Adri Wischmann 2021
