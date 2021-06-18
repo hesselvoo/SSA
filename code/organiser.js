@@ -33,6 +33,7 @@ const organiserURL = "http://courseware.com";
 const organiserTelephone = "01 234 56 789";
 const organiserMail = "info@courseware.com";
 const organiserDID = "did:example:123456789abcdefghi#key-1";
+const test = "test";
 
 // public eventdetails -for demopurposes hardcoded
 const privateOrgPrivateTitle = "Interreg Blockchain-event midterm";
